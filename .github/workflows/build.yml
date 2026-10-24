@@ -29,15 +29,33 @@ jobs:
 
       - name: Build
         run: |
-          ./autogen.sh
+          set -o pipefail
+          ./autogen.sh 2>&1 | tee ci-build.log
           mkdir _build && cd _build
-          ../configure $CONFIGURE_FLAGS
-          make -j$(nproc)
+          ../configure $CONFIGURE_FLAGS 2>&1 | tee -a ../ci-build.log
+          make -j$(nproc) 2>&1 | tee -a ../ci-build.log
 
       - name: Package
         run: |
           cd _build
-          ../packaging/linux/make-dist.sh .. . ../dist
+          ../packaging/linux/make-dist.sh .. . ../dist 2>&1 | tee -a ../ci-build.log
+
+      - name: Report build log on failure
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f ci-build.log ]; then
+            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            tail -n 60 ci-build.log > ci-tail.txt
+            for f in ci-errors.txt ci-tail.txt; do
+              msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
+              echo "::error title=$f::$msg"
+            done
+          fi
+          if [ -f _build/config.log ]; then
+            msg=$(tail -n 40 _build/config.log | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::error title=config.log::$msg"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -84,15 +102,34 @@ jobs:
 
       - name: Build
         run: |
-          ./autogen.sh
+          set -o pipefail
+          ./autogen.sh 2>&1 | tee ci-build.log
           mkdir _build && cd _build
-          ../configure $CONFIGURE_FLAGS
-          make -j$(nproc)
+          ../configure $CONFIGURE_FLAGS 2>&1 | tee -a ../ci-build.log
+          make -j$(nproc) 2>&1 | tee -a ../ci-build.log
 
       - name: Package
         run: |
           cd _build
-          ../packaging/windows/make-dist.sh .. ../dist
+          set -o pipefail
+          ../packaging/windows/make-dist.sh .. ../dist 2>&1 | tee -a ../ci-build.log
+
+      - name: Report build log on failure
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f ci-build.log ]; then
+            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            tail -n 60 ci-build.log > ci-tail.txt
+            for f in ci-errors.txt ci-tail.txt; do
+              msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
+              echo "::error title=$f::$msg"
+            done
+          fi
+          if [ -f _build/config.log ]; then
+            msg=$(tail -n 40 _build/config.log | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::error title=config.log::$msg"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -113,16 +150,35 @@ jobs:
 
       - name: Build
         run: |
-          ./autogen.sh
+          set -o pipefail
+          ./autogen.sh 2>&1 | tee ci-build.log
           mkdir _build && cd _build
-          ../configure $CONFIGURE_FLAGS
-          make -j$(sysctl -n hw.ncpu)
+          ../configure $CONFIGURE_FLAGS 2>&1 | tee -a ../ci-build.log
+          make -j$(sysctl -n hw.ncpu) 2>&1 | tee -a ../ci-build.log
 
       - name: Package
         run: |
           cd _build
-          DEPS_PREFIX="$(brew --prefix)" ../packaging/macos/make-dist.sh .. strip zip
+          set -o pipefail
+          DEPS_PREFIX="$(brew --prefix)" ../packaging/macos/make-dist.sh .. strip zip 2>&1 | tee -a ../ci-build.log
           mkdir -p ../dist && mv *.dmg ../dist/
+
+      - name: Report build log on failure
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f ci-build.log ]; then
+            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            tail -n 60 ci-build.log > ci-tail.txt
+            for f in ci-errors.txt ci-tail.txt; do
+              msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
+              echo "::error title=$f::$msg"
+            done
+          fi
+          if [ -f _build/config.log ]; then
+            msg=$(tail -n 40 _build/config.log | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::error title=config.log::$msg"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
