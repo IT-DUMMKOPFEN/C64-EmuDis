@@ -55,8 +55,8 @@
 #include "directx_renderer_impl.h"
 #else
 #include "opengl_renderer.h"
-#include "software_renderer.h"
 #endif
+#include "software_renderer.h"
 
 #include "lightpen.h"
 #include "log.h"
