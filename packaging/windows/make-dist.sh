@@ -41,8 +41,9 @@ copy_tree() {
 # copy the DLLs an executable needs (only those from the MSYS2 prefix)
 copy_dlls() {
     ntldd -R "$1" | gawk '/\\bin\\/{print $3;}' | cygpath -f - | while read -r dll; do
-        if [ -f "$dll" ]; then
-            cp -u "$dll" "$DIST/bin/"
+        # skip DLLs already in the distribution (ntldd also resolves those)
+        if [ -f "$dll" ] && [ ! -f "$DIST/bin/$(basename "$dll")" ]; then
+            cp "$dll" "$DIST/bin/"
         fi
     done
 }
@@ -66,7 +67,7 @@ fi
 cd "$MINGW_PREFIX"
 cp bin/gspawn-win64-helper*.exe "$DIST/bin/" 2>/dev/null || true
 for l in librsvg-2-2 libxml2-2 liblzma-5; do
-    [ -f "bin/$l.dll" ] && cp -u "bin/$l.dll" "$DIST/bin/"
+    if [ -f "bin/$l.dll" ] && [ ! -f "$DIST/bin/$l.dll" ]; then cp "bin/$l.dll" "$DIST/bin/"; fi
 done
 cp --parents lib/gdk-pixbuf-2.0/2.10.0/loaders/*pixbufloader*{png,svg,xpm}*.dll "$DIST" 2>/dev/null || \
     cp -r --parents lib/gdk-pixbuf-2.0 "$DIST"
