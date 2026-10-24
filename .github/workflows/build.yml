@@ -153,6 +153,10 @@ jobs:
                    adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg; do
             brew install "$f" || failed="$failed $f"
           done
+          case "$failed" in
+            *adwaita*) brew reinstall python@3.15 python@3.14 python@3.13 2>/dev/null || true
+                       brew install adwaita-icon-theme || true ;;
+          esac
           echo "brew failures:$failed" | tee ci-build.log
           if ! command -v xa >/dev/null; then
             brew install xa || {

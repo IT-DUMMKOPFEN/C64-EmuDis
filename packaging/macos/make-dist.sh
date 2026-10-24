@@ -521,7 +521,11 @@ elif [ "$UI_TYPE" = "GTK3" ]; then
   }
 
   mkdir $APP_SHARE/icons
-  import_scalable_gtk_icons Adwaita
+  if [ -d "$DEPS_PREFIX/share/icons/Adwaita" ]; then
+    import_scalable_gtk_icons Adwaita
+  else
+    echo "WARNING: Adwaita icon theme not found, icons in dialogs may be missing"
+  fi
 
   # hicolor is small, just copy it. It doesn't have any scalable assets.
   cp -r $DEPS_PREFIX/share/icons/hicolor "$APP_SHARE/icons/"
