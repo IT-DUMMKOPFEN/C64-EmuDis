@@ -6,6 +6,11 @@ on:
     tags: [ 'v*' ]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Create a GitHub release with this tag (e.g. v0.1a), empty = no release'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -229,7 +234,7 @@ jobs:
 
   release:
     name: GitHub release
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
     needs: [ linux, windows, macos ]
     runs-on: ubuntu-latest
     steps:
@@ -241,7 +246,9 @@ jobs:
         with:
           files: artifacts/*
           prerelease: true
-          name: C64-EmuDis ${{ github.ref_name }}
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: C64-EmuDis ${{ inputs.release_tag || github.ref_name }}
           body: |
             **C64-EmuDis** - a Commodore 64 emulator based on VICE 3.10 with memory analysis tools
             (live memory viewer, font/sprite/SID finder, assembler, disassembler, snapshot manager,
