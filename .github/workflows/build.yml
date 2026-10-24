@@ -148,15 +148,24 @@ jobs:
       - name: Install dependencies
         run: |
           brew update || true
+          # the runner image sometimes ships a broken Homebrew Python, which
+          # breaks every formula that depends on it (gtk+3, librsvg, ffmpeg ...)
+          for py in $(brew list --formula | grep '^python@'); do
+            brew reinstall "$py" || brew uninstall --ignore-dependencies --force "$py" || true
+          done
+          pkgs="autoconf automake libtool pkgconf python gtk+3 glew dos2unix libpng
+                adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg"
           failed=""
-          for f in autoconf automake libtool pkgconf gtk+3 glew dos2unix libpng \
-                   adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg; do
+          for f in $pkgs; do
             brew install "$f" || failed="$failed $f"
           done
-          case "$failed" in
-            *adwaita*) brew reinstall python@3.15 python@3.14 python@3.13 2>/dev/null || true
-                       brew install adwaita-icon-theme || true ;;
-          esac
+          if [ -n "$failed" ]; then
+            echo "retrying:$failed"
+            brew link --overwrite python@3 2>/dev/null || true
+            still=""
+            for f in $failed; do brew install "$f" || still="$still $f"; done
+            failed="$still"
+          fi
           echo "brew failures:$failed" | tee ci-build.log
           if ! command -v xa >/dev/null; then
             brew install xa || {
