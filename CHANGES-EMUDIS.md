@@ -34,6 +34,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/shared/archdep_user_*_path.c`, `archdep_default_sysfile_pathlist.c` | own settings/data folder `c64-emudis` (does not touch an installed VICE) |
 | `src/arch/shared/coproc.c` | Windows: quote the whole command for `cmd.exe /C` so paths with spaces work |
 | `src/arch/shared/macOS-launcher.sh` | `C64-EmuDis.app` starts x64sc |
+| `src/arch/shared/archdep_is_macos_bindist.c` | detect any `*.app` bundle, not only `VICE.app` (ROMs were not found in `C64-EmuDis.app`) |
 | `src/arch/shared/macOS-launcher.c` | missing `<mach-o/dyld.h>` include (build error with newer Xcode) |
 | `src/drive/drive-resources.c` | true drive emulation off by default (no loading times) |
 | `src/autostart.c`, `src/autostart-prg.h` | no random autostart delay, PRGs injected into RAM by default |

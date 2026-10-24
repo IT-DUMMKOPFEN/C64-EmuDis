@@ -42,14 +42,18 @@
  */
 int archdep_is_macos_bindist(void) {
 #ifdef MACOS_COMPILE
-    static char *BINDIST_BOOT_PATH = "/VICE.app/Contents/Resources/bin";
+    /* C64-EmuDis: accept any app bundle name (upstream only accepted
+       "VICE.app", so "C64-EmuDis.app" did not find its ROMs) */
+    static const char *BINDIST_BOOT_SUFFIX = ".app/Contents/Resources/bin";
     char resolved_boot_path[PATH_MAX];
-    char *bindist_boot_path_ptr;
+    size_t len, slen;
 
-    realpath(archdep_boot_path(), resolved_boot_path);
-
-    bindist_boot_path_ptr = strstr(resolved_boot_path, BINDIST_BOOT_PATH);
-    if (bindist_boot_path_ptr && strlen(bindist_boot_path_ptr) == strlen(BINDIST_BOOT_PATH)) {
+    if (realpath(archdep_boot_path(), resolved_boot_path) == NULL) {
+        return 0;
+    }
+    len = strlen(resolved_boot_path);
+    slen = strlen(BINDIST_BOOT_SUFFIX);
+    if (len > slen && strcmp(resolved_boot_path + len - slen, BINDIST_BOOT_SUFFIX) == 0) {
         return 1;
     }
 #endif
