@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=C64-EmuDis
+GenericName=Commodore 64 Emulator
+Comment=C64 emulator based on VICE with memory analysis tools
+Exec=C64-EmuDis %f
+Icon=c64-emudis
+Terminal=false
+Categories=Game;Emulator;Development;
+MimeType=application/x-d64;application/x-t64;application/x-prg;

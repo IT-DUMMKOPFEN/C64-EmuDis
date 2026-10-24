@@ -1,0 +1,10 @@
+# build output
+/_build/
+/build-*/
+/dist/
+autom4te.cache/
+*.o
+*.a
+*.dmg
+config.log
+config.status

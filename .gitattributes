@@ -1,0 +1,12 @@
+# keep LF line endings everywhere (the build scripts run in bash/MSYS2)
+* text=auto eol=lf
+*.bin binary
+*.png binary
+*.ico binary
+*.icns binary
+*.ttf binary
+*.gif binary
+*.vsf binary
+*.d64 binary
+*.crt binary
+*.prg binary

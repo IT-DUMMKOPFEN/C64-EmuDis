@@ -1,0 +1,28 @@
+# C64-EmuDis hotkeys for the Tools menu
+#
+# Author:   IT-Dummkopfen
+# Updated:  2026-10-24
+#
+# See src/arch/shared/uiactions.h for a list of action names.
+
+!if !MACOS
+    emudis-memory-viewer        <Alt><Shift>m
+    emudis-font-finder          <Alt><Shift>f
+    emudis-sprite-finder        <Alt><Shift>g
+    emudis-sid-finder           <Alt><Shift>i
+    emudis-assembler            <Alt><Shift>a
+    emudis-disassembler         <Alt><Shift>d
+    emudis-snapshot-manager     <Alt><Shift>k
+    emudis-video-toggle         <Alt><Shift>v
+    emudis-screenshot           <Alt><Shift>x
+!else
+    emudis-memory-viewer        <Command><Shift>m
+    emudis-font-finder          <Command><Shift>f
+    emudis-sprite-finder        <Command><Shift>g
+    emudis-sid-finder           <Command><Shift>i
+    emudis-assembler            <Command><Shift>a
+    emudis-disassembler         <Command><Shift>d
+    emudis-snapshot-manager     <Command><Shift>k
+    emudis-video-toggle         <Command><Shift>v
+    emudis-screenshot           <Command><Shift>x
+!endif
