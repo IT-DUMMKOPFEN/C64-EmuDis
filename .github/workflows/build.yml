@@ -80,7 +80,8 @@ jobs:
           msystem: UCRT64
           update: true
           install: >-
-            base-devel autotools git zip unzip dos2unix flex bison
+            base-devel autotools git zip unzip dos2unix flex bison libiconv
+            mingw-w64-ucrt-x86_64-libiconv
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-pkgconf
             mingw-w64-ucrt-x86_64-gtk3
@@ -99,6 +100,8 @@ jobs:
             cp /tmp/xa65/xa/xa.exe /ucrt64/bin/xa.exe
           fi
           xa --version | head -1
+          command -v iconv || pacman -S --noconfirm --needed iconv || true
+          command -v iconv
 
       - name: Build
         run: |
