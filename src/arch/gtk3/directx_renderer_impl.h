@@ -152,6 +152,9 @@ void vice_directx_destroy_context_impl(vice_directx_renderer_context_t *context)
 
 void vice_directx_impl_async_render(void *pool_data, void *job_data);
 
+int vice_directx_impl_probe(void);
+int vice_directx_impl_failed(void);
+
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif

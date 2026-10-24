@@ -55,6 +55,11 @@ static const char *help_text =
        "<i>Preferences → Settings → Peripheral devices → Drive → True drive emulation</i>.")
     LI("All VICE settings are in <i>Preferences → Settings</i>. C64-EmuDis keeps its own settings "
        "file, so an installed VICE is not affected.")
+    LI("<b>White or black emulator screen?</b> Some virtual machines (Parallels, VMware, "
+       "VirtualBox) and remote desktops have no working DirectX/OpenGL. C64-EmuDis then uses its "
+       "<b>software renderer</b> automatically on Windows. You can also choose it yourself: "
+       "<i>Tools → Software renderer</i> (restart needed), the command line option "
+       KBD("-softrender") " or, on Windows, <i>Start C64-EmuDis (software renderer).bat</i>.")
 
     H2("Live Memory Viewer")
     P("Shows the 64KB address space while the C64 runs. Choose between the <b>CPU view</b> "

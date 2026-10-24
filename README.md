@@ -49,6 +49,11 @@ Ready-to-run builds for all three platforms are produced by GitHub Actions
 | macOS 12+ (Apple Silicon) | `C64-EmuDis-0.1a-macos-arm64.dmg` | drag to Applications; first start: right-click → *Open* (not notarized); ffmpeg included |
 | Linux (x86_64) | `C64-EmuDis-0.1a-linux-x86_64.tar.gz` | extract, run `./C64-EmuDis`; needs GTK 3, GLEW and `ffmpeg` (for video) from your distribution |
 
+If the emulator screen stays white or black (typical for virtual machines such as Parallels on a
+Mac, VMware or VirtualBox), use the **software renderer**: *Tools → Software renderer*, the option
+`-softrender`, or on Windows `Start C64-EmuDis (software renderer).bat`. On Windows it is chosen
+automatically when Direct3D 11 is not available.
+
 ---
 
 ## Building from source

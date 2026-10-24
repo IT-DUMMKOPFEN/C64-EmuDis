@@ -425,6 +425,7 @@ static const ui_action_info_private_t action_info_list[] = {
     { ACTION_EMUDIS_VIDEO_TOGGLE,    "emudis-video-toggle", "Start/stop MP4 recording", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_SCREENSHOT,      "emudis-screenshot", "Take a screenshot (PNG)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_FASTLOAD_TOGGLE, "emudis-fastload-toggle", "Toggle fast loading (no loading times)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
+    { ACTION_EMUDIS_SOFTRENDER_TOGGLE, "emudis-softrender-toggle", "Toggle the software renderer (after restart)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_HELP,            "emudis-help", "Show C64-EmuDis help", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_HISTORY,         "emudis-history", "Show the history of the C64", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_ABOUT,           "emudis-about", "Show the C64-EmuDis about page", VICE_MACHINE_ALL^VICE_MACHINE_VSID },

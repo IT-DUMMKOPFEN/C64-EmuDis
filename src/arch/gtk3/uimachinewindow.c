@@ -40,6 +40,8 @@
 #if !defined(MACOS_COMPILE) && !defined(WINDOWS_COMPILE)
 #include <gdk/gdkx.h>
 #endif
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #ifdef MACOS_COMPILE
 #import <CoreGraphics/CGEvent.h>
@@ -53,6 +55,7 @@
 #include "directx_renderer_impl.h"
 #else
 #include "opengl_renderer.h"
+#include "software_renderer.h"
 #endif
 
 #include "lightpen.h"
@@ -681,9 +684,34 @@ static void machine_window_create(video_canvas_t *canvas)
 #ifdef WINDOWS_COMPILE
     canvas->renderer_backend = &vice_directx_backend;
     backend_label = "DirectX";
+    /* C64-EmuDis: probe Direct3D first, fall back to the software renderer */
+    {
+        bool gpu_ok = true;
+
+        if (software_renderer_get_choice() == EMUDIS_RENDERER_AUTO
+                && getenv("C64EMUDIS_RENDERER") == NULL) {
+            gpu_ok = vice_directx_impl_probe() != 0;
+            if (!gpu_ok) {
+                log_warning(LOG_DEFAULT, "Direct3D 11 is not available, "
+                            "using the software renderer.");
+            }
+        }
+        if (software_renderer_wanted(gpu_ok)) {
+            canvas->renderer_backend = &vice_software_backend;
+            backend_label = "Software (Cairo)";
+            software_renderer_set_active(true);
+        }
+    }
 #else
     canvas->renderer_backend = &vice_opengl_backend;
     backend_label = "OpenGL";
+    /* C64-EmuDis: OpenGL problems are only detected later, so on Linux and
+     * macOS the software renderer is used when selected by the user */
+    if (software_renderer_wanted(true)) {
+        canvas->renderer_backend = &vice_software_backend;
+        backend_label = "Software (Cairo)";
+        software_renderer_set_active(true);
+    }
 #endif
 
     log_message(machine_window_log, "Chip '%s' using GTK3 backend '%s'.",

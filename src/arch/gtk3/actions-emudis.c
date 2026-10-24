@@ -34,6 +34,7 @@
 #include "util.h"
 
 #include "emudis.h"
+#include "software_renderer.h"
 #include "actions-emudis.h"
 
 
@@ -141,6 +142,24 @@ static void fastload_action(ui_action_map_t *self)
                           : "Fast loading OFF (true drive emulation on)", true);
 }
 
+static void softrender_action(ui_action_map_t *self)
+{
+    bool on = software_renderer_get_choice() != EMUDIS_RENDERER_SOFTWARE;
+
+    if (software_renderer_set_saved(on ? EMUDIS_RENDERER_SOFTWARE
+                                       : EMUDIS_RENDERER_AUTO) < 0) {
+        ui_display_statustext("Could not save the renderer setting", true);
+    } else if (on == software_renderer_is_active()) {
+        ui_display_statustext(on ? "Software renderer is active"
+                                 : "GPU renderer will be used", true);
+    } else {
+        ui_display_statustext(on
+                              ? "Software renderer selected - restart C64-EmuDis"
+                              : "GPU renderer selected - restart C64-EmuDis", true);
+    }
+    vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SOFTRENDER_TOGGLE, (gboolean)on);
+}
+
 static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_MEMVIEW,         .handler = memview_action,      .uithread = true },
     { .action = ACTION_EMUDIS_FONTS,           .handler = fonts_action,        .uithread = true },
@@ -153,6 +172,7 @@ static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_VIDEO_TOGGLE,    .handler = video_toggle_action, .uithread = true },
     { .action = ACTION_EMUDIS_SCREENSHOT,      .handler = screenshot_action,   .uithread = true },
     { .action = ACTION_EMUDIS_FASTLOAD_TOGGLE, .handler = fastload_action,     .uithread = true },
+    { .action = ACTION_EMUDIS_SOFTRENDER_TOGGLE, .handler = softrender_action, .uithread = true },
     { .action = ACTION_EMUDIS_HELP,            .handler = help_action,         .uithread = true },
     { .action = ACTION_EMUDIS_HISTORY,         .handler = history_action,      .uithread = true },
     { .action = ACTION_EMUDIS_ABOUT,           .handler = about_action,        .uithread = true },
@@ -166,6 +186,8 @@ void actions_emudis_register(void)
 
 void actions_emudis_setup_ui(void)
 {
+    vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SOFTRENDER_TOGGLE,
+            (gboolean)(software_renderer_get_choice() == EMUDIS_RENDERER_SOFTWARE));
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_FASTLOAD_TOGGLE,
                                              (gboolean)emudis_fastload_get());
 }

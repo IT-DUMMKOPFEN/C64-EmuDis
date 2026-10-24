@@ -106,6 +106,7 @@
 #include "uidiskattach.h"
 #include "uihotkeys.h"
 #include "uimachinemenu.h"
+#include "software_renderer.h"
 #include "uimachinewindow.h"
 #include "uimedia.h"
 #include "uimenu.h"
@@ -2122,6 +2123,9 @@ void ui_destroy_main_window(int index)
  */
 int ui_cmdline_options_init(void)
 {
+    if (software_renderer_cmdline_options_init() < 0) {
+        return -1;
+    }
     return cmdline_register_options(cmdline_options_common);
 }
 
@@ -2415,6 +2419,10 @@ int ui_resources_init(void)
     }
     /* initialize string resources */
     if (resources_register_string(resources_string) < 0) {
+        return -1;
+    }
+    /* C64-EmuDis: renderer choice */
+    if (software_renderer_resources_init() < 0) {
         return -1;
     }
     /* initialize int/bool resources */

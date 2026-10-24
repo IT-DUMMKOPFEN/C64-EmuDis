@@ -103,6 +103,11 @@ cat > "$DIST/Start C64-EmuDis.bat" <<'EOF'
 @echo off
 start "" "%~dp0bin\C64-EmuDis.exe" %*
 EOF
+cat > "$DIST/Start C64-EmuDis (software renderer).bat" <<'EOF'
+@echo off
+rem For virtual machines and PCs where the emulator window stays white
+start "" "%~dp0bin\C64-EmuDis.exe" -softrender %*
+EOF
 
 (cd "$OUT" && rm -f "$NAME.zip" && zip -r -9 -q "$NAME.zip" "$NAME")
 echo "Done: $OUT/$NAME.zip"

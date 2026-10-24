@@ -60,22 +60,119 @@ extern "C"
  * support). Can be forced with the environment variable C64EMUDIS_DX_WARP=1. */
 static int emudis_use_warp = -1;
 
+static volatile int emudis_dx_failed = 0;
+
 static void emudis_switch_to_warp(const char *what)
 {
     if (emudis_use_warp != 1) {
         log_warning(LOG_DEFAULT, "DirectX: '%s' failed with the hardware renderer, "
                     "switching to the WARP software renderer.", what);
         emudis_use_warp = 1;
+    } else if (!emudis_dx_failed) {
+        log_error(LOG_DEFAULT, "DirectX: '%s' failed with the WARP renderer as well. "
+                  "Use the software renderer: Tools -> Renderer -> Software "
+                  "(or start with -softrender).", what);
+        emudis_dx_failed = 1;
     }
 }
 
 #define EMUDIS_DX_FAIL(what) \
     { \
-        vice_directx_impl_log_windows_error(what); \
+        log_warning(LOG_DEFAULT, "DirectX: %s failed, HRESULT 0x%08lx.", what, (unsigned long)result); \
         emudis_switch_to_warp(what); \
         vice_directx_destroy_context_impl(context); \
         return; \
     }
+
+/* Create a D3D11 device, trying several feature level lists: some runtimes
+ * (e.g. older or virtualised ones) reject D3D_FEATURE_LEVEL_11_1 with
+ * E_INVALIDARG. Logs the HRESULT of every failed attempt. */
+static HRESULT emudis_create_d3d_device(bool warp,
+                                        ID3D11Device **device,
+                                        ID3D11DeviceContext **device_context)
+{
+    static const D3D_FEATURE_LEVEL levels_all[] = {
+        D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_9_3,  D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
+    };
+    static const D3D_FEATURE_LEVEL levels_no111[] = {
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_9_3,  D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
+    };
+    HRESULT result;
+
+    result = D3D11CreateDevice(nullptr,
+                               warp ? D3D_DRIVER_TYPE_WARP : D3D_DRIVER_TYPE_HARDWARE,
+                               0, D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+                               levels_all, ARRAYSIZE(levels_all), D3D11_SDK_VERSION,
+                               device, NULL, device_context);
+    if (SUCCEEDED(result)) {
+        return result;
+    }
+    log_warning(LOG_DEFAULT, "DirectX: D3D11CreateDevice(%s, 11.1..9.1) failed, HRESULT 0x%08lx.",
+                warp ? "WARP" : "hardware", (unsigned long)result);
+
+    result = D3D11CreateDevice(nullptr,
+                               warp ? D3D_DRIVER_TYPE_WARP : D3D_DRIVER_TYPE_HARDWARE,
+                               0, D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+                               levels_no111, ARRAYSIZE(levels_no111), D3D11_SDK_VERSION,
+                               device, NULL, device_context);
+    if (FAILED(result)) {
+        log_warning(LOG_DEFAULT, "DirectX: D3D11CreateDevice(%s, 11.0..9.1) failed, HRESULT 0x%08lx.",
+                    warp ? "WARP" : "hardware", (unsigned long)result);
+    }
+    return result;
+}
+
+extern "C" int vice_directx_impl_probe(void)
+{
+    ID3D11Device *device = NULL;
+    ID3D11DeviceContext *device_context = NULL;
+    ID3D11Device1 *device1 = NULL;
+    ID2D1Factory1 *factory = NULL;
+    D2D1_FACTORY_OPTIONS options;
+    HRESULT result;
+    int warp;
+
+    ZeroMemory(&options, sizeof(options));
+    result = D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory1),
+                               &options, (void **)&factory);
+    if (FAILED(result)) {
+        log_warning(LOG_DEFAULT, "DirectX: D2D1CreateFactory failed, HRESULT 0x%08lx.",
+                    (unsigned long)result);
+        return 0;
+    }
+    factory->Release();
+
+    for (warp = 0; warp <= 1; warp++) {
+        result = emudis_create_d3d_device(warp != 0, &device, &device_context);
+        if (FAILED(result)) {
+            continue;
+        }
+        result = device->QueryInterface(__uuidof(ID3D11Device1), (void **)&device1);
+        DX_RELEASE(device_context);
+        DX_RELEASE(device);
+        if (FAILED(result)) {
+            log_warning(LOG_DEFAULT, "DirectX: no ID3D11Device1 (%s), HRESULT 0x%08lx.",
+                        warp ? "WARP" : "hardware", (unsigned long)result);
+            continue;
+        }
+        DX_RELEASE(device1);
+        if (warp) {
+            log_message(LOG_DEFAULT, "DirectX: no usable GPU device, using WARP.");
+            emudis_use_warp = 1;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" int vice_directx_impl_failed(void)
+{
+    return emudis_dx_failed;
+}
 
 static void build_directx_resources(vice_directx_renderer_context_t *context)
 {
@@ -113,33 +210,10 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
 
     /* Create the Direct 3D device */
 
-    D3D_FEATURE_LEVEL featureLevels[] =
-        {
-            D3D_FEATURE_LEVEL_11_1,
-            D3D_FEATURE_LEVEL_11_0,
-            D3D_FEATURE_LEVEL_10_1,
-            D3D_FEATURE_LEVEL_10_0,
-            D3D_FEATURE_LEVEL_9_3,
-            D3D_FEATURE_LEVEL_9_2,
-            D3D_FEATURE_LEVEL_9_1
-        };
-
     if (!context->d3d_device) {
         ID3D11Device *d3d_device;
         ID3D11DeviceContext *d3d_device_context;
-        result =
-            D3D11CreateDevice(
-                nullptr,                            /* default gpu adapter */
-                emudis_use_warp ? D3D_DRIVER_TYPE_WARP : D3D_DRIVER_TYPE_HARDWARE,
-                0,                                  /* no software renderer implementation DLL */
-                D3D11_CREATE_DEVICE_BGRA_SUPPORT,   /* needed for Direct2D compatibility */
-                featureLevels,
-                ARRAYSIZE(featureLevels),
-                D3D11_SDK_VERSION,
-                &d3d_device,
-                NULL,                               /* don't return resulting feature level */
-                &d3d_device_context
-                );
+        result = emudis_create_d3d_device(emudis_use_warp != 0, &d3d_device, &d3d_device_context);
         if (FAILED(result))
         {
             EMUDIS_DX_FAIL("D3D11CreateDevice");

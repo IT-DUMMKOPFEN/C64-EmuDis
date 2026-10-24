@@ -1013,6 +1013,10 @@ static const ui_menu_item_t tools_menu[] = {
         .type     = UI_MENU_TYPE_ITEM_CHECK,
         .action   = ACTION_EMUDIS_FASTLOAD_TOGGLE
     },
+    {   .label    = "Software renderer (no GPU, after restart)",
+        .type     = UI_MENU_TYPE_ITEM_CHECK,
+        .action   = ACTION_EMUDIS_SOFTRENDER_TOGGLE
+    },
     UI_MENU_TERMINATOR
 };
 /* }}} */

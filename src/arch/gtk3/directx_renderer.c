@@ -46,6 +46,8 @@
 #include "resources.h"
 #include "ui.h"
 #include "uistatusbar.h"
+#include "software_renderer.h"
+#include "widgets/base/basedialogs.h"
 
 #define CANVAS_LOCK() pthread_mutex_lock(&canvas->lock)
 #define CANVAS_UNLOCK() pthread_mutex_unlock(&canvas->lock)
@@ -306,11 +308,34 @@ static void vice_directx_refresh_rect(video_canvas_t *canvas,
     CANVAS_UNLOCK();
 }
 
+/* C64-EmuDis: DirectX failed even with WARP - offer the software renderer */
+static void emudis_dx_failed_response(GtkDialog *dialog, gboolean result)
+{
+    if (result) {
+        if (software_renderer_set_saved(EMUDIS_RENDERER_SOFTWARE) == 0) {
+            vice_gtk3_message_info(NULL, "Software renderer",
+                    "The software renderer is now selected.\n\n"
+                    "Please close and restart C64-EmuDis.");
+        }
+    }
+}
+
 static void vice_directx_on_ui_frame_clock(GdkFrameClock *clock, video_canvas_t *canvas)
 {
+    static int asked = 0;
     context_t *context = canvas->renderer_context;
 
     ui_update_statusbars();
+
+    if (!asked && vice_directx_impl_failed()) {
+        asked = 1;
+        vice_gtk3_message_confirm(NULL, emudis_dx_failed_response,
+                "DirectX is not working",
+                "C64-EmuDis cannot draw the C64 screen with DirectX on this "
+                "system (this happens in some virtual machines).\n\n"
+                "Switch to the software renderer? It works everywhere and "
+                "needs a restart of C64-EmuDis.");
+    }
 
     CANVAS_LOCK();
 

@@ -66,6 +66,7 @@ libarch_a_SOURCES = \
 	emudis_snapshots.c \
 	emudis_spritesearch.c \
 	emudis_video.c \
+	software_renderer.c \
 	actions-clipboard.c \
 	actions-datasette.c \
 	actions-debug.c \
@@ -159,6 +160,7 @@ endif
 EXTRA_DIST = \
 	actions-emudis.h \
 	emudis.h \
+	software_renderer.h \
 	emudis_6502.h \
 	Resources/VICE.icns \
 	actions-cartridge.h \
