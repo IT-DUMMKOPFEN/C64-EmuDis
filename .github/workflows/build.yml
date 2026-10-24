@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           if [ -f ci-build.log ]; then
-            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            grep -nE "error|Error|ERROR|No such file|not found|cannot|broken|failed|Failed" ci-build.log | tail -n 40 > ci-errors.txt || true
             tail -n 60 ci-build.log > ci-tail.txt
             for f in ci-errors.txt ci-tail.txt; do
               msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
@@ -122,7 +122,7 @@ jobs:
         shell: bash
         run: |
           if [ -f ci-build.log ]; then
-            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            grep -nE "error|Error|ERROR|No such file|not found|cannot|broken|failed|Failed" ci-build.log | tail -n 40 > ci-errors.txt || true
             tail -n 60 ci-build.log > ci-tail.txt
             for f in ci-errors.txt ci-tail.txt; do
               msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
@@ -144,32 +144,39 @@ jobs:
     # macOS minutes are expensive on private repos: build only for releases
     # (tags v*) or when started manually (Actions -> Run workflow)
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
-          brew update || true
-          # the runner image sometimes ships a broken Homebrew Python, which
-          # breaks every formula that depends on it (gtk+3, librsvg, ffmpeg ...)
-          for py in $(brew list --formula | grep '^python@'); do
-            brew reinstall "$py" || brew uninstall --ignore-dependencies --force "$py" || true
+          : > ci-build.log
+          brew --version | tee -a ci-build.log
+          # make sure the Python the formulas depend on is really installed
+          for py in python@3.15 python@3.14 python@3.13; do
+            brew list "$py" >/dev/null 2>&1 && { brew reinstall "$py" >> ci-build.log 2>&1 || true; }
           done
-          pkgs="autoconf automake libtool pkgconf python gtk+3 glew dos2unix libpng
+          brew install python@3.15 >> ci-build.log 2>&1 || true
+          pkgs="autoconf automake libtool pkgconf gtk+3 glew dos2unix libpng
                 adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg"
           failed=""
           for f in $pkgs; do
-            brew install "$f" || failed="$failed $f"
+            echo "### brew install $f" >> ci-build.log
+            brew install "$f" >> ci-build.log 2>&1 || failed="$failed $f"
           done
           if [ -n "$failed" ]; then
-            echo "retrying:$failed"
-            brew link --overwrite python@3 2>/dev/null || true
             still=""
-            for f in $failed; do brew install "$f" || still="$still $f"; done
+            for f in $failed; do
+              echo "### retry $f" >> ci-build.log
+              brew install "$f" >> ci-build.log 2>&1 || still="$still $f"
+            done
             failed="$still"
           fi
-          echo "brew failures:$failed" | tee ci-build.log
+          echo "brew failures:$failed" | tee -a ci-build.log
           if ! command -v xa >/dev/null; then
             brew install xa || {
               git clone --depth 1 https://github.com/fachat/xa65.git /tmp/xa65
@@ -203,7 +210,7 @@ jobs:
         shell: bash
         run: |
           if [ -f ci-build.log ]; then
-            grep -nE "error|Error|ERROR|No such file|not found|cannot" ci-build.log | tail -n 40 > ci-errors.txt || true
+            grep -nE "error|Error|ERROR|No such file|not found|cannot|broken|failed|Failed" ci-build.log | tail -n 40 > ci-errors.txt || true
             tail -n 60 ci-build.log > ci-tail.txt
             for f in ci-errors.txt ci-tail.txt; do
               msg=$(sed -e 's/%/%25/g' -e 's/\r//g' "$f" | awk 'BEGIN{ORS="%0A"}{print}')
