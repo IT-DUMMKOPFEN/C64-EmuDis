@@ -122,6 +122,29 @@ jobs:
           set -o pipefail
           ../packaging/windows/make-dist.sh .. ../dist 2>&1 | tee -a ../ci-build.log
 
+      - name: Smoke test (start the packaged emulator)
+        continue-on-error: true
+        run: |
+          D=$(ls -d dist/C64-EmuDis-*-windows-x64 | head -1)
+          W=$(cygpath -w "$PWD")
+          (timeout 150 "$D/bin/C64-EmuDis.exe" -default -sounddev dummy -limitcycles 4000000 \
+              -exitscreenshot "$W\\smoke-win.png" -logfile "$W\\smoke-win.log"; echo "exit code $?") \
+              > smoke-win-stdout.log 2>&1 || true
+          cat smoke-win-stdout.log
+          ls "$D/bin" | head -50 > smoke-win-files.log
+          ls "$D" >> smoke-win-files.log
+
+      - name: Smoke test report
+        if: always()
+        shell: bash
+        run: |
+          for f in smoke-*.log; do
+            [ -f "$f" ] || continue
+            msg=$(tail -n 70 "$f" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::warning title=$f::$msg"
+          done
+          ls -la smoke-* 2>/dev/null | sed 's/^/smoke: /' || echo "smoke: no files"
+
       - name: Report build log on failure
         if: failure()
         shell: bash
@@ -143,6 +166,12 @@ jobs:
         with:
           name: C64-EmuDis-windows-x64
           path: dist/*.zip
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-windows
+          path: smoke-*
 
   macos:
     name: macOS arm64 (Apple Silicon)
@@ -210,6 +239,30 @@ jobs:
           DEPS_PREFIX="$(brew --prefix)" ../packaging/macos/make-dist.sh .. strip zip 2>&1 | tee -a ../ci-build.log
           mkdir -p ../dist && mv *.dmg ../dist/
 
+      - name: Smoke test (start the packaged emulator)
+        continue-on-error: true
+        run: |
+          APP=$(ls -d _build/C64-EmuDis-*-macos-*/C64-EmuDis.app | head -1)
+          echo "app: $APP"
+          du -sh "$APP" > smoke-mac-files.log
+          ls "$APP/Contents/Resources/bin" "$APP/Contents/Resources/lib" | head -80 >> smoke-mac-files.log
+          otool -L "$APP/Contents/Resources/bin/x64sc" >> smoke-mac-files.log
+          perl -e 'alarm 150; exec @ARGV' "$APP/Contents/MacOS/C64-EmuDis" -default -sounddev dummy \
+              -limitcycles 4000000 -exitscreenshot "$PWD/smoke-mac.png" -logfile "$PWD/smoke-mac.log" \
+              > smoke-mac-stdout.log 2>&1; echo "exit code $?" >> smoke-mac-stdout.log
+          cat smoke-mac-stdout.log
+
+      - name: Smoke test report
+        if: always()
+        shell: bash
+        run: |
+          for f in smoke-*.log; do
+            [ -f "$f" ] || continue
+            msg=$(tail -n 70 "$f" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::warning title=$f::$msg"
+          done
+          ls -la smoke-* 2>/dev/null | sed 's/^/smoke: /' || echo "smoke: no files"
+
       - name: Report build log on failure
         if: failure()
         shell: bash
@@ -231,6 +284,12 @@ jobs:
         with:
           name: C64-EmuDis-macos-arm64
           path: dist/*.dmg
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-macos
+          path: smoke-*
 
   release:
     name: GitHub release
