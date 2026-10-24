@@ -147,9 +147,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew update
-          brew install autoconf automake pkg-config gtk+3 glew xa dos2unix libpng \
-            adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg
+          brew update || true
+          failed=""
+          for f in autoconf automake libtool pkgconf gtk+3 glew dos2unix libpng \
+                   adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg; do
+            brew install "$f" || failed="$failed $f"
+          done
+          echo "brew failures:$failed" | tee ci-build.log
+          if ! command -v xa >/dev/null; then
+            brew install xa || {
+              git clone --depth 1 https://github.com/fachat/xa65.git /tmp/xa65
+              make -C /tmp/xa65/xa xa CC=clang
+              sudo cp /tmp/xa65/xa/xa /usr/local/bin/xa
+            }
+          fi
+          xa --version | head -1
+          for t in autoconf automake pkg-config glib-compile-schemas gdk-pixbuf-query-loaders ffmpeg; do
+            command -v $t || { echo "missing tool: $t" | tee -a ci-build.log; exit 1; }
+          done
+          pkg-config --modversion gtk+-3.0 glew
 
       - name: Build
         run: |
