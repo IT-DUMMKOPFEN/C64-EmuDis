@@ -26,6 +26,8 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <limits.h>
+#include <stdint.h>
+#include <mach-o/dyld.h>   /* C64-EmuDis: _NSGetExecutablePath() */
 
 int main(int argc, char *argv[])
 {
