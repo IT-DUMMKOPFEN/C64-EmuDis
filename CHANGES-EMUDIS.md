@@ -43,6 +43,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/gfxoutput.h` | maximum video bitrate raised to 50 Mbit/s (for 4x videos) |
 | `src/arch/gtk3/uimachinewindow.c` | renderer selection: probe Direct3D on Windows, use the software renderer if it fails or when selected |
 | `src/arch/gtk3/directx_renderer_impl.cc/.h`, `directx_renderer.c` | WARP fallback, retry without feature level 11.1, HRESULTs in the log, `vice_directx_impl_probe()`, dialog offering the software renderer when DirectX fails |
+| `src/arch/shared/sounddrv/soundcoreaudio.c` | macOS: reopen the sound device when the audio device changes or stops playing (e.g. Bluetooth headset connected) instead of freezing the emulation |
 | `src/mainlock.c/.h` | `mainlock_get_depth()` so tool windows know whether they hold the VICE lock |
 | `src/Makefile.am`, `src/arch/gtk3/Makefile.am`, `data/hotkeys/Makefile.am` (+ generated `.in`) | new files |
 | `data/hotkeys/hotkeys.vhk` | include `hotkeys-emudis.vhk` |

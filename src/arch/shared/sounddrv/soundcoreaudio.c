@@ -399,6 +399,118 @@ static int determine_output_device_id(void)
 
 static AudioUnit outputUnit;
 
+/* C64-EmuDis: recover from audio device changes (Bluetooth headset connected,
+ * sample rate switch, device removed). VICE syncs the emulation to the sound
+ * device; when CoreAudio stops pulling samples the emulation used to freeze
+ * forever. Device change listeners and a stall watchdog now trigger a reopen
+ * of the sound device instead. */
+#include <time.h>
+
+static atomic_int emudis_device_changed;
+static atomic_uint emudis_render_calls;
+static unsigned int emudis_last_render_calls;
+static double emudis_stall_since;
+static int emudis_listeners_installed;
+static AudioDeviceID emudis_listened_device = kAudioDeviceUnknown;
+
+static double emudis_now(void)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
+}
+
+static OSStatus emudis_property_listener(AudioObjectID object, UInt32 count,
+                                         const AudioObjectPropertyAddress *addresses,
+                                         void *data)
+{
+    atomic_store(&emudis_device_changed, 1);
+    return noErr;
+}
+
+static const AudioObjectPropertyAddress emudis_system_props[] = {
+    { kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster },
+    { kAudioHardwarePropertyDevices,             kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster }
+};
+static const AudioObjectPropertyAddress emudis_device_props[] = {
+    { kAudioDevicePropertyNominalSampleRate, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster },
+    { kAudioDevicePropertyDeviceIsAlive,     kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster },
+    { kAudioDevicePropertyStreamConfiguration, kAudioObjectPropertyScopeOutput, kAudioObjectPropertyElementMaster }
+};
+
+static void emudis_listeners_install(void)
+{
+    size_t i;
+
+    if (emudis_listeners_installed) {
+        return;
+    }
+    for (i = 0; i < sizeof emudis_system_props / sizeof emudis_system_props[0]; i++) {
+        AudioObjectAddPropertyListener(kAudioObjectSystemObject, &emudis_system_props[i],
+                                       emudis_property_listener, NULL);
+    }
+    emudis_listened_device = device;
+    if (device != kAudioDeviceUnknown) {
+        for (i = 0; i < sizeof emudis_device_props / sizeof emudis_device_props[0]; i++) {
+            AudioObjectAddPropertyListener(device, &emudis_device_props[i],
+                                           emudis_property_listener, NULL);
+        }
+    }
+    emudis_listeners_installed = 1;
+    atomic_store(&emudis_device_changed, 0);
+    emudis_stall_since = 0.0;
+}
+
+static void emudis_listeners_remove(void)
+{
+    size_t i;
+
+    if (!emudis_listeners_installed) {
+        return;
+    }
+    for (i = 0; i < sizeof emudis_system_props / sizeof emudis_system_props[0]; i++) {
+        AudioObjectRemovePropertyListener(kAudioObjectSystemObject, &emudis_system_props[i],
+                                          emudis_property_listener, NULL);
+    }
+    if (emudis_listened_device != kAudioDeviceUnknown) {
+        for (i = 0; i < sizeof emudis_device_props / sizeof emudis_device_props[0]; i++) {
+            AudioObjectRemovePropertyListener(emudis_listened_device, &emudis_device_props[i],
+                                              emudis_property_listener, NULL);
+        }
+    }
+    emudis_listened_device = kAudioDeviceUnknown;
+    emudis_listeners_installed = 0;
+}
+
+/* Called from the emulation thread. Returns 1 if the device must be reopened. */
+static int emudis_check_device(int buffer_full)
+{
+    unsigned int calls;
+    double now;
+
+    if (atomic_exchange(&emudis_device_changed, 0)) {
+        log_message(LOG_DEFAULT, "sound (coreaudio): audio device changed, reopening.");
+        return 1;
+    }
+    calls = atomic_load(&emudis_render_calls);
+    if (!buffer_full || calls != emudis_last_render_calls) {
+        emudis_last_render_calls = calls;
+        emudis_stall_since = 0.0;
+        return 0;
+    }
+    now = emudis_now();
+    if (emudis_stall_since == 0.0) {
+        emudis_stall_since = now;
+        return 0;
+    }
+    if (now - emudis_stall_since > 0.5) {
+        log_message(LOG_DEFAULT, "sound (coreaudio): audio device stopped playing, reopening.");
+        emudis_stall_since = 0.0;
+        return 1;
+    }
+    return 0;
+}
+
 static OSStatus audio_render(void *inRefCon,
                              AudioUnitRenderActionFlags  *ioActionFlags,
                              const AudioTimeStamp        *inTimeStamp,
@@ -407,6 +519,7 @@ static OSStatus audio_render(void *inRefCon,
                              AudioBufferList             *ioData)
 {
     UInt32 numFrames = inNumberFrames;
+    atomic_fetch_add(&emudis_render_calls, 1);
     return AudioConverterFillComplexBuffer(converter,
                                            converter_input,
                                            NULL,
@@ -562,6 +675,7 @@ static int audio_open(AudioStreamBasicDescription *in)
         return -1;
     }
 
+    emudis_listeners_install();
     return 0;
 }
 
@@ -609,6 +723,8 @@ static int audio_stop(void)
 static void audio_close(void)
 {
     OSStatus err;
+
+    emudis_listeners_remove();
 
     if (outputUnit) {
         audio_stop();
@@ -713,7 +829,14 @@ static int coreaudio_write(int16_t *pbuf, size_t nr)
 
 static int coreaudio_bufferspace(void)
 {
-    return (fragment_count - fragments_in_queue) * frames_in_fragment;
+    int space = (fragment_count - fragments_in_queue) * frames_in_fragment;
+
+    /* C64-EmuDis: never block the emulation on a dead/changed device */
+    if (emudis_check_device(space < (int)frames_in_fragment)) {
+        sound_playdev_reopen = TRUE;
+        return (int)(fragment_count * frames_in_fragment);
+    }
+    return space;
 }
 
 static void coreaudio_close(void)
