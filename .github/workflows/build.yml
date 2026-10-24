@@ -241,4 +241,17 @@ jobs:
         with:
           files: artifacts/*
           prerelease: true
-          generate_release_notes: true
+          name: C64-EmuDis ${{ github.ref_name }}
+          body: |
+            **C64-EmuDis** - a Commodore 64 emulator based on VICE 3.10 with memory analysis tools
+            (live memory viewer, font/sprite/SID finder, assembler, disassembler, snapshot manager,
+            screenshots and MP4 video recording 1x-4x). No loading times by default.
+
+            | Platform | File | How to start |
+            |----------|------|--------------|
+            | Windows 10/11 (x64) | `C64-EmuDis-*-windows-x64.zip` | unzip, run `bin\C64-EmuDis.exe`. SmartScreen: "More info" -> "Run anyway" |
+            | macOS 12+ (Apple Silicon) | `C64-EmuDis-*-macos-arm64.dmg` | drag to Applications, first start: right-click -> Open (not notarized) |
+            | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.tar.gz` | extract, run `./C64-EmuDis` (needs GTK 3, GLEW, ffmpeg) |
+
+            Author: IT-Dummkopfen - License: GPL-2.0-or-later (based on VICE).
+            This is an alpha version - feedback welcome!
