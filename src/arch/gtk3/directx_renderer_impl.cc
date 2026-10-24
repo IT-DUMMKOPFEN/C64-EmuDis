@@ -37,6 +37,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <stdlib.h>
+
 extern "C"
 {
 #include "archdep.h"
@@ -53,9 +55,39 @@ extern "C"
 
 #define DX_RELEASE(x) if (x) { (x)->Release(); (x) = NULL; }
 
+/* C64-EmuDis: fall back to the WARP software rasterizer when the hardware
+ * path fails (e.g. Windows in Parallels/UTM/VirtualBox without full GPU
+ * support). Can be forced with the environment variable C64EMUDIS_DX_WARP=1. */
+static int emudis_use_warp = -1;
+
+static void emudis_switch_to_warp(const char *what)
+{
+    if (emudis_use_warp != 1) {
+        log_warning(LOG_DEFAULT, "DirectX: '%s' failed with the hardware renderer, "
+                    "switching to the WARP software renderer.", what);
+        emudis_use_warp = 1;
+    }
+}
+
+#define EMUDIS_DX_FAIL(what) \
+    { \
+        vice_directx_impl_log_windows_error(what); \
+        emudis_switch_to_warp(what); \
+        vice_directx_destroy_context_impl(context); \
+        return; \
+    }
+
 static void build_directx_resources(vice_directx_renderer_context_t *context)
 {
     HRESULT result = S_OK;
+
+    if (emudis_use_warp < 0) {
+        const char *env = getenv("C64EMUDIS_DX_WARP");
+        emudis_use_warp = (env != NULL && env[0] == '1') ? 1 : 0;
+        if (emudis_use_warp) {
+            log_message(LOG_DEFAULT, "DirectX: using the WARP software renderer (C64EMUDIS_DX_WARP=1).");
+        }
+    }
 
     /*
      * Device dependent resources
@@ -75,9 +107,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
                 (void **)&context->d2d_factory
                 );
         if (FAILED(result)) {
-            vice_directx_impl_log_windows_error("D2D1CreateFactory1");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("D2D1CreateFactory1");
         }
     }
 
@@ -100,7 +130,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result =
             D3D11CreateDevice(
                 nullptr,                            /* default gpu adapter */
-                D3D_DRIVER_TYPE_HARDWARE,
+                emudis_use_warp ? D3D_DRIVER_TYPE_WARP : D3D_DRIVER_TYPE_HARDWARE,
                 0,                                  /* no software renderer implementation DLL */
                 D3D11_CREATE_DEVICE_BGRA_SUPPORT,   /* needed for Direct2D compatibility */
                 featureLevels,
@@ -112,26 +142,20 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
                 );
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("D3D11CreateDevice");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("D3D11CreateDevice");
         }
 
         result = d3d_device->QueryInterface(__uuidof(ID3D11Device1), (void **)&context->d3d_device);
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("ID3D11Device1");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("ID3D11Device1");
         }
         d3d_device->Release();
 
         result = d3d_device_context->QueryInterface(__uuidof(ID3D11DeviceContext1), (void **)&context->d3d_device_context);
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("ID3D11DeviceContext1");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("ID3D11DeviceContext1");
         }
         d3d_device_context->Release();
     }
@@ -142,9 +166,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result = context->d3d_device->QueryInterface(__uuidof(IDXGIDevice), (void **)&context->dxgi_device);
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("QueryInterface IDXGIDevice");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("QueryInterface IDXGIDevice");
         }
     }
 
@@ -154,9 +176,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result = context->d2d_factory->CreateDevice(context->dxgi_device, &context->d2d_device);
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("CreateDevice ID2D1Device");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("CreateDevice ID2D1Device");
         }
 
         result =
@@ -166,9 +186,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
                 );
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("CreateDeviceContext ID2D1DeviceContext");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("CreateDeviceContext ID2D1DeviceContext");
         }
     }
 
@@ -213,9 +231,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result = context->dxgi_device->GetAdapter(&context->dxgi_adapter);
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("GetAdapter IDXGIAdapter");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("GetAdapter IDXGIAdapter");
         }
     }
 
@@ -225,9 +241,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result = context->dxgi_adapter->GetParent(IID_PPV_ARGS(&context->dxgi_factory));
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("dxgi_factory");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("dxgi_factory");
         }
     }
 
@@ -259,9 +273,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
             );
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("d3d_swap_chain");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("d3d_swap_chain");
         }
 
         /* Ensure that DXGI doesn't queue more than one frame at a time. */
@@ -278,9 +290,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
         result = context->d3d_swap_chain->GetBuffer(0, IID_PPV_ARGS(&context->dxgi_surface));
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("dxgi_surface");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("dxgi_surface");
         }
     }
 
@@ -305,9 +315,7 @@ static void build_directx_resources(vice_directx_renderer_context_t *context)
                 );
         if (FAILED(result))
         {
-            vice_directx_impl_log_windows_error("dxgi_bitmap");
-            vice_directx_destroy_context_impl(context);
-            return;
+            EMUDIS_DX_FAIL("dxgi_bitmap");
         }
     }
 }

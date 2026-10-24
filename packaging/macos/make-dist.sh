@@ -84,19 +84,7 @@ echo " CPU arch: $CPU_ARCH"
 # setup BUILD dir
 BUILD_DIR="C64-EmuDis-$VICE_VERSION-macos-$CPU_ARCH"
 
-if [[ ! -z "${GITHUB_REF_NAME:-}" ]]; then
-  #GitHub Actions build
-  BUILD_DIR="$BUILD_DIR-$GITHUB_REF_NAME"
-else
-  SVN_VERSION=$(svn info --show-item revision "$TOP_DIR" 2>/dev/null || true)
-  if [[ ! -z "$SVN_VERSION" ]]; then
-    BUILD_DIR="$BUILD_DIR-r$SVN_VERSION"
-    # if the source is not clean, add '-uncommitted-changes' to the name
-    if [[ ! -z "$(svn status -q "$TOP_DIR")" ]]; then
-      BUILD_DIR="$BUILD_DIR-uncommitted-changes"
-    fi
-  fi
-fi
+# C64-EmuDis: no branch/revision suffix in the folder name
 
 if [ -d $BUILD_DIR ]; then
   rm -rf $BUILD_DIR
