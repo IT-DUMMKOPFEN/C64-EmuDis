@@ -9,7 +9,7 @@
 #
 # Result: <output dir>/C64-EmuDis-<version>-windows-x64.zip
 #
-#   C64-EmuDis-0.1a-windows-x64/
+#   C64-EmuDis-<version>-windows-x64/
 #     bin/C64-EmuDis.exe, c1541.exe, ffmpeg.exe, *.dll
 #     C64/ DRIVES/ PRINTER/ GLSL/ common/ hotkeys/   (data, found via bin/..)
 #     lib/ share/                                   (GTK runtime files)

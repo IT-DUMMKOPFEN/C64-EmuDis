@@ -103,7 +103,8 @@ enum {
 #if defined(MACOS_COMPILE)
 #define SOUND_SAMPLE_RATE 48000
 #define SOUND_SAMPLE_BUFFER_SIZE 20
-#define SOUND_FRAGMENT_SIZE SOUND_FRAGMENT_VERY_SMALL
+/* C64-EmuDis: large fragments survive audio device changes (Bluetooth) */
+#define SOUND_FRAGMENT_SIZE SOUND_FRAGMENT_LARGE
 #else
 #define SOUND_SAMPLE_RATE 48000
 #define SOUND_SAMPLE_BUFFER_SIZE 30

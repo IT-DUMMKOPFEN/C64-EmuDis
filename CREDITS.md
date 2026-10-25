@@ -1,7 +1,7 @@
 # Credits and licenses
 
 ## C64-EmuDis
-- Version 0.1a, © 2026 **IT-Dummkopfen** - GPL-2.0-or-later
+- Version 0.2b, © 2026 **IT-Dummkopfen** - GPL-2.0-or-later
 - https://github.com/IT-DUMMKOPFEN/C64-EmuDis
 
 ## Used components

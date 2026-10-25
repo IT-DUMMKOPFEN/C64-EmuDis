@@ -23,14 +23,14 @@
 #define EMUDIS_VERSION_H
 
 #define EMUDIS_NAME         "C64-EmuDis"
-#define EMUDIS_VERSION      "0.1a"
+#define EMUDIS_VERSION      "0.2b"
 #define EMUDIS_AUTHOR       "IT-Dummkopfen"
 #define EMUDIS_YEAR         "2026"
 #define EMUDIS_URL          "https://github.com/IT-DUMMKOPFEN/C64-EmuDis"
 #define EMUDIS_VICE_BASE    "VICE 3.10"
 #define EMUDIS_LICENSE      "GNU General Public License v2.0 or later"
 
-/** \brief  Window title: "C64-EmuDis 0.1a" */
+/** \brief  Window title: "C64-EmuDis 0.2b" */
 #define EMUDIS_TITLE        EMUDIS_NAME " " EMUDIS_VERSION
 
 #endif

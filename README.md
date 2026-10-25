@@ -1,6 +1,6 @@
 # C64-EmuDis
 
-**C64-EmuDis 0.1a** is a Commodore 64 emulator for **Windows 11, macOS (Apple Silicon) and Linux**.
+**C64-EmuDis 0.2b** is a Commodore 64 emulator for **Windows 11, macOS (Apple Silicon) and Linux**.
 It is based on [VICE 3.10](https://vice-emu.sourceforge.io/) and keeps every VICE feature and
 setting, and it adds tools for looking inside the running machine.
 
@@ -45,9 +45,10 @@ Ready-to-run builds for all three platforms are produced by GitHub Actions
 
 | Platform | File | Notes |
 |----------|------|-------|
-| Windows 10/11 (x64) | `C64-EmuDis-0.1a-windows-x64.zip` | unzip, start `bin\C64-EmuDis.exe`; ffmpeg included |
-| macOS 12+ (Apple Silicon) | `C64-EmuDis-0.1a-macos-arm64.dmg` | drag to Applications; first start: right-click → *Open* (not notarized); ffmpeg included |
-| Linux (x86_64) | `C64-EmuDis-0.1a-linux-x86_64.tar.gz` | extract, run `./C64-EmuDis`; needs GTK 3, GLEW and `ffmpeg` (for video) from your distribution |
+| Windows 10/11 (x64) | `C64-EmuDis-0.2b-windows-x64.zip` | unzip, start `bin\C64-EmuDis.exe`; ffmpeg included |
+| macOS 12+ (Apple Silicon) | `C64-EmuDis-0.2b-macos-arm64.dmg` | drag to Applications; first start: right-click → *Open* (not notarized); ffmpeg included |
+| Linux (x86_64) | `C64-EmuDis-0.2b-linux-x86_64.AppImage` | **recommended**: `chmod +x` and start it; GTK 3, GLEW and ffmpeg included |
+| Linux (x86_64) | `C64-EmuDis-0.2b-linux-x86_64.tar.gz` | small portable folder: extract, run `./C64-EmuDis`; needs GTK 3, GLEW and `ffmpeg` (for video) from your distribution |
 
 If the emulator screen stays white or black (typical for virtual machines such as Parallels on a
 Mac, VMware or VirtualBox), use the **software renderer**: *Tools → Software renderer*, the option
