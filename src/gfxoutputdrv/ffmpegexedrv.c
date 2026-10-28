@@ -1015,6 +1015,13 @@ static int start_ffmpeg_executable(void)
                 || video_codec == AV_CODEC_ID_MPEG4) {
             strcat(command, "-pix_fmt yuv420p ");
         }
+        /* C64-EmuDis: encode fast and without lookahead. With the default
+           ("medium", ~40 frames lookahead) slower machines could not encode
+           in real time and newer ffmpeg versions then stopped reading the
+           audio until the video caught up, which broke the recording. */
+        if (video_codec == AV_CODEC_ID_H264 || video_codec == AV_CODEC_ID_H265) {
+            strcat(command, "-preset veryfast -tune zerolatency ");
+        }
     }
     /* options for the output file (audio) */
     if ((audio_has_codec > 0) && (audio_codec != AV_CODEC_ID_NONE)) {

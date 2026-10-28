@@ -63,20 +63,22 @@ export PATH="$TOOLS:$PATH"
 
 # --- static ffmpeg for the video recorder --------------------------------
 if [ "$ARCH" = "x86_64" ]; then
-    # a stable release build: the "master" builds change options (e.g.
-    # -thread_queue_size is no longer accepted as an input option there)
-    got=0
-    for v in 7.1 7.0; do
-        if fetch "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n$v-latest-linux64-gpl-$v.tar.xz" \
-                 "$WORK/ffmpeg.tar.xz"; then
-            got=1
-            break
-        fi
+    # a stable release build (8.x, else 7.x): the "master" builds change
+    # options (-thread_queue_size is no longer accepted as an input option).
+    # The names of the release builds change with every ffmpeg release, so
+    # look them up on the release page.
+    fetch https://github.com/BtbN/FFmpeg-Builds/releases/expanded_assets/latest "$WORK/assets.html"
+    asset=""
+    for major in 8 7; do
+        asset=$(grep -o "ffmpeg-n$major\.[0-9]*-latest-linux64-gpl-$major\.[0-9]*\.tar\.xz" "$WORK/assets.html" \
+                | sort -t. -k2,2n -u | tail -n 1 || true)
+        [ -n "$asset" ] && break
     done
-    if [ $got -eq 0 ]; then
-        echo "ERROR: no stable ffmpeg build found"
+    if [ -z "$asset" ]; then
+        echo "ERROR: no stable ffmpeg 7.x/8.x build found"
         exit 1
     fi
+    fetch "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/$asset" "$WORK/ffmpeg.tar.xz"
     mkdir -p "$WORK/ffmpeg"
     tar -xJf "$WORK/ffmpeg.tar.xz" -C "$WORK/ffmpeg" --strip-components=1
     cp "$WORK/ffmpeg/bin/ffmpeg" "$APPDIR/usr/bin/ffmpeg"
