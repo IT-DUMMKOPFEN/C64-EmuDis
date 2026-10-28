@@ -32,8 +32,10 @@
 
 void gfxoutput_init_ffmpegexe(int help);
 
-/* C64-EmuDis: seconds of video and audio sent to ffmpeg so far (diagnostics) */
-void ffmpegexedrv_get_sync_info(double *video_seconds, double *audio_seconds);
+/* C64-EmuDis: seconds of video and audio sent to ffmpeg so far (diagnostics).
+   The pointer is defined in the GTK3 UI (emudis_selftest.c) and set by the
+   driver, so programs without the video driver (vsid) still link. */
+extern void (*emudis_ffmpeg_sync_info)(double *video_seconds, double *audio_seconds);
 
 /* deprecated access for UIs that do not use the gfxoutputdrv->formatlist yet: */
 extern gfxoutputdrv_format_t *ffmpegdrv_formatlist;

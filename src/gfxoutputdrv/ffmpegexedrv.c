@@ -310,6 +310,7 @@ log_t ffmpeg_log = LOG_DEFAULT;
 /******************************************************************************/
 
 static int ffmpegexedrv_init_file(void);
+static void ffmpegexedrv_get_sync_info(double *video_seconds, double *audio_seconds);
 static void ffmpegexedrv_shutdown(void);
 
 /******************************************************************************/
@@ -1806,6 +1807,8 @@ static void get_formats_and_codecs(void)
 /* public, init this output driver */
 void gfxoutput_init_ffmpegexe(int help)
 {
+    emudis_ffmpeg_sync_info = ffmpegexedrv_get_sync_info;
+
     if (help) {
         gfxoutput_register(&ffmpegexe_drv);
         return;
@@ -1818,7 +1821,7 @@ void gfxoutput_init_ffmpegexe(int help)
 
 
 /* C64-EmuDis: seconds of video and audio sent to ffmpeg so far */
-void ffmpegexedrv_get_sync_info(double *video_seconds, double *audio_seconds)
+static void ffmpegexedrv_get_sync_info(double *video_seconds, double *audio_seconds)
 {
     *video_seconds = (fps > 0.0) ? (double)framecounter / fps : 0.0;
     *audio_seconds = (audio_input_sample_rate > 0)

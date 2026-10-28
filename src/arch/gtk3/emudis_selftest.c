@@ -34,6 +34,9 @@
 #include "gfxoutputdrv/ffmpegexedrv.h"
 #include "emudis.h"
 
+/* set by the FFmpeg driver (see gfxoutputdrv/ffmpegexedrv.h) */
+void (*emudis_ffmpeg_sync_info)(double *video_seconds, double *audio_seconds) = NULL;
+
 static log_t st_log = LOG_DEFAULT;
 static int seconds = 0;
 
@@ -50,8 +53,8 @@ static gboolean st_tick(gpointer data)
     mainlock_obtain();
     clk = maincpu_clk;
     recording = screenshot_is_recording();
-    if (recording) {
-        ffmpegexedrv_get_sync_info(&vs, &as);
+    if (recording && emudis_ffmpeg_sync_info != NULL) {
+        emudis_ffmpeg_sync_info(&vs, &as);
     }
     mainlock_release();
     log_message(st_log, "t=%ds clk=%lu recording=%d video=%.2fs audio=%.2fs",
