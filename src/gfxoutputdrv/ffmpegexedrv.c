@@ -61,6 +61,8 @@
 
 #include "archdep.h"
 #include "archdep_sleep.h"
+#include "archdep_user_state_path.h"
+#include "archdep_mkdir.h"
 #include "cmdline.h"
 #include "coproc.h"
 #include "ffmpegexedrv.h"
@@ -499,6 +501,35 @@ static void prepare_port_numbers(void)
     log_message(ffmpeg_log, "prepare_port_numbers %d:%d", current_video_port, current_audio_port);
 }
 
+
+/* C64-EmuDis: send to ffmpeg without ever blocking the emulator forever.
+ * Returns len on success, -1 on error or when ffmpeg takes no data for
+ * FFMPEG_SEND_TIMEOUT_MS (the recording is then stopped). */
+#define FFMPEG_SEND_TIMEOUT_MS 4000
+
+static ssize_t ffmpeg_send(vice_network_socket_t *sock, const void *buf, size_t len, const char *what)
+{
+    ssize_t res;
+    tick_t start = tick_now();
+    double ms;
+
+    res = vice_network_send_all(sock, buf, len, FFMPEG_SEND_TIMEOUT_MS);
+    ms = (double)tick_now_delta(start) * 1000.0 / (double)tick_per_second();
+    if (res == -2) {
+        log_error(ffmpeg_log, "ffmpeg takes no %s data for %d s, stopping the recording.",
+                  what, FFMPEG_SEND_TIMEOUT_MS / 1000);
+        return -1;
+    }
+    if (res < 0) {
+        log_error(ffmpeg_log, "writing %s data to ffmpeg failed (ffmpeg stopped?).", what);
+        return -1;
+    }
+    if (ms > 250.0) {
+        log_warning(ffmpeg_log, "ffmpeg was slow taking %s data (%.0f ms).", what, ms);
+    }
+    return res;
+}
+
 static ssize_t write_video_frame(VIDEOFrame *pic)
 {
     ssize_t len = INPUT_VIDEO_BPP * video_height * video_width;
@@ -509,7 +540,7 @@ static ssize_t write_video_frame(VIDEOFrame *pic)
             log_error(ffmpeg_log, "FFMPEG: write_video_frame ffmpeg_video_socket is 0 (framecount:%"PRIu64")", framecounter);
             return -1;
         }
-        res = vice_network_send(ffmpeg_video_socket, pic->data, len, 0 /* flags */);
+        res = ffmpeg_send(ffmpeg_video_socket, pic->data, (size_t)len, "video");
         if (res < 0) {
             return -1;
         }
@@ -548,14 +579,14 @@ static int write_initial_audio_frames(void)
     DBG(("audio len:%zd (%zd)", len, len * DUMMY_FRAMES_AUDIO));
     memset(ffmpegexedrv_audio_in.buffer, 0, len);
     for (frm = 0; frm < DUMMY_FRAMES_AUDIO; frm++) {
-        res = vice_network_send(ffmpeg_audio_socket, ffmpegexedrv_audio_in.buffer, len, 0 /* flags */);
+        res = ffmpeg_send(ffmpeg_audio_socket, ffmpegexedrv_audio_in.buffer, (size_t)len, "audio");
         if (res != len) {
             log_error(ffmpeg_log, "ffmpegexedrv: Error writing to AUDIO socket");
             return -1;
         }
         if (audio_input_channels == 2) {
             /* stereo - send twice the amount of data */
-            res = vice_network_send(ffmpeg_audio_socket, ffmpegexedrv_audio_in.buffer, len, 0 /* flags */);
+            res = ffmpeg_send(ffmpeg_audio_socket, ffmpegexedrv_audio_in.buffer, (size_t)len, "audio");
             if (res != len) {
                 log_error(ffmpeg_log, "ffmpegexedrv: Error writing to AUDIO socket");
                 return -1;
@@ -740,7 +771,8 @@ static int start_ffmpeg_executable(void)
             "-loglevel verbose "
             /* "-loglevel error " */
 #else
-            "-loglevel quiet "
+            /* C64-EmuDis: warnings/errors go to ffmpeg.log (see below) */
+            "-loglevel warning -nostats "
 #endif
     );
 
@@ -837,6 +869,18 @@ static int start_ffmpeg_executable(void)
     strcat(command, "\"");
     strcat(command, outfilename ? outfilename : "outfile.avi");
     strcat(command, "\"");
+
+    /* C64-EmuDis: keep ffmpeg's messages in <user state dir>/ffmpeg.log;
+       this also makes sure ffmpeg never blocks on a full stdout/stderr pipe */
+    {
+        char *ffmpeg_logfile = util_join_paths(archdep_user_state_path(), "ffmpeg.log", NULL);
+        archdep_mkdir_recursive(archdep_user_state_path(), 0755);
+        strcat(command, " > \"");
+        strcat(command, ffmpeg_logfile);
+        strcat(command, "\" 2>&1");
+        log_message(ffmpeg_log, "ffmpeg messages go to '%s'.", ffmpeg_logfile);
+        lib_free(ffmpeg_logfile);
+    }
 
 #ifndef VICE_IS_SERVER
     /* kill old process in case it is still running for whatever reason */
@@ -1130,13 +1174,13 @@ static int ffmpegexe_soundmovie_encode(soundmovie_buffer_t *audio_in)
     if ((audio_has_codec > 0) && (audio_codec != AV_CODEC_ID_NONE)) {
         /* FIXME: we might have an endianess problem here, we might have to swap lo/hi on BE machines */
         if (audio_input_channels == 1) {
-            res = vice_network_send(ffmpeg_audio_socket, &audio_in->buffer[0], audio_in->used * 2, 0 /* flags */);
+            res = ffmpeg_send(ffmpeg_audio_socket, &audio_in->buffer[0], (size_t)(audio_in->used * 2), "audio");
             if (res != audio_in->used * 2) {
                 return -1;
             }
             audio_input_counter += audio_in->used;
         } else if (audio_input_channels == 2) {
-            res = vice_network_send(ffmpeg_audio_socket, &audio_in->buffer[0], audio_in->used * 2, 0 /* flags */);
+            res = ffmpeg_send(ffmpeg_audio_socket, &audio_in->buffer[0], (size_t)(audio_in->used * 2), "audio");
             if (res != audio_in->used * 2) {
                 return -1;
             }

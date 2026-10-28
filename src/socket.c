@@ -1068,6 +1068,64 @@ ssize_t vice_network_receive(vice_network_socket_t * sockfd, void * buffer, size
      1 if the specified socket has data; 0 if it does not contain
      any data, and -1 in case of an error.
 */
+/*! \brief C64-EmuDis: send a complete buffer, waiting at most timeout_ms
+
+  Unlike vice_network_send() this handles partial sends and interrupted
+  calls, and it never blocks forever: when the receiver takes no data for
+  timeout_ms milliseconds it gives up.
+
+  \return buffer_length on success, -1 on error, -2 on timeout
+*/
+ssize_t vice_network_send_all(vice_network_socket_t *sockfd,
+                              const void            *buffer,
+                              size_t                 buffer_length,
+                              int                    timeout_ms)
+{
+    const char *p = buffer;
+    size_t left = buffer_length;
+
+    while (left > 0) {
+        fd_set fdsockset;
+        TIMEVAL timeout;
+        int ready;
+        ssize_t ret;
+
+        timeout.tv_sec = timeout_ms / 1000;
+        timeout.tv_usec = (timeout_ms % 1000) * 1000;
+        FD_ZERO(&fdsockset);
+        FD_SET(sockfd->sockfd, &fdsockset);
+        ready = select(sockfd->sockfd + 1, NULL, &fdsockset, NULL, &timeout);
+        if (ready == 0) {
+            return -2;
+        }
+        if (ready < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            return -1;
+        }
+        signals_pipe_set();
+        ret = send(sockfd->sockfd, p, left, 0);
+        signals_pipe_unset();
+        if (ret < 0) {
+            if (errno == EINTR || errno == EAGAIN
+#ifdef EWOULDBLOCK
+                || errno == EWOULDBLOCK
+#endif
+                ) {
+                continue;
+            }
+            return -1;
+        }
+        if ((size_t)ret > left) {
+            return -1;
+        }
+        p += ret;
+        left -= (size_t)ret;
+    }
+    return (ssize_t)buffer_length;
+}
+
 int vice_network_select_poll_one(vice_network_socket_t * readsockfd)
 {
     TIMEVAL timeout = { 0, 0 };

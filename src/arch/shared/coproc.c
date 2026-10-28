@@ -231,7 +231,8 @@ static int CreateChildProcess(
         szCmdline,     /* command line */
         NULL,          /* process security attributes */
         NULL,          /* primary thread security attributes */
-        FALSE,         /* handles are inherited */
+        TRUE,          /* handles are inherited (C64-EmuDis: was FALSE, then the
+                          child got no stdin/stdout and ffmpeg was "not found") */
         0,             /* creation flags */
         NULL,          /* use parent's environment */
         NULL,          /* use parent's current directory */
@@ -245,8 +246,9 @@ static int CreateChildProcess(
         /* Close handles to the child process and its primary thread.
             Some applications might keep these handles to monitor the status
             of the child process, for example. */
+        /* C64-EmuDis: keep the process handle open, kill_coproc() needs it
+           (it was closed here, so ffmpeg could never be terminated) */
         *pid = piProcInfo.hProcess;
-        CloseHandle(piProcInfo.hProcess);
         CloseHandle(piProcInfo.hThread);
 
         /* Close handles to the stdin and stdout pipes no longer needed by the child process.
@@ -316,14 +318,17 @@ int fork_coproc(int *fd_wr, int *fd_rd, char *cmd, vice_pid_t *pid)
 
 void kill_coproc(vice_pid_t pid)
 {
+    DWORD code = 0;
+
     log_message(LOG_DEFAULT, "terminating child process id: %p", pid);
-    if (TerminateProcess(pid, 0) != 0) {
-        if (GetLastError() == ERROR_INVALID_HANDLE) {
-            log_debug(LOG_DEFAULT, "child process id %p does not exist anymore.", pid);
-        } else {
-            log_error(LOG_DEFAULT, "terminating child process id %p failed.", pid);
+    /* C64-EmuDis: TerminateProcess() returns nonzero on SUCCESS */
+    if (GetExitCodeProcess(pid, &code) && code == STILL_ACTIVE) {
+        if (TerminateProcess(pid, 0) == 0) {
+            log_error(LOG_DEFAULT, "terminating child process id %p failed (%lu).",
+                      pid, (unsigned long)GetLastError());
         }
     }
+    CloseHandle(pid);
 }
 
 #else
