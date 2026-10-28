@@ -202,60 +202,90 @@ void kill_coproc(vice_pid_t pid)
 
 /* https://marc.info/?l=apreq-dev&m=104840521714506 mentions some hackery we might need too */
 
-/* Create a child process that uses the previously created pipes for STDIN and STDOUT. */
+/* Create a child process that uses the previously created pipes for STDIN and STDOUT.
+ *
+ * C64-EmuDis:
+ * - the child gets no console window at all (CREATE_NO_WINDOW). With the
+ *   hidden console window of cmd.exe the emulator lost the keyboard focus
+ *   while recording a video, keys did not reach the C64 any more.
+ * - only the two pipe handles are inherited (PROC_THREAD_ATTRIBUTE_HANDLE_LIST),
+ *   not every inheritable handle of the emulator (sockets, files).
+ * - the process handle is kept, kill_coproc() needs it.
+ */
 static int CreateChildProcess(
-    TCHAR *szCmdline,
+    char *szCmdline,
     HANDLE hChildStd_IN_Rd,
     HANDLE hChildStd_OUT_Wr,
     HANDLE *pid)
 {
     PROCESS_INFORMATION piProcInfo;
-    STARTUPINFO siStartInfo;
+    STARTUPINFOEXA siStartInfo;
+    HANDLE inherit[2];
+    SIZE_T attr_size = 0;
+    LPPROC_THREAD_ATTRIBUTE_LIST attr = NULL;
+    DWORD flags = CREATE_NO_WINDOW;
     BOOL bSuccess = FALSE;
 
-    /* Set up members of the PROCESS_INFORMATION structure. */
-    ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
+    ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+    ZeroMemory(&siStartInfo, sizeof(siStartInfo));
+    siStartInfo.StartupInfo.cb = sizeof(STARTUPINFOA);
+    siStartInfo.StartupInfo.hStdError = hChildStd_OUT_Wr;
+    siStartInfo.StartupInfo.hStdOutput = hChildStd_OUT_Wr;
+    siStartInfo.StartupInfo.hStdInput = hChildStd_IN_Rd;
+    siStartInfo.StartupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+    siStartInfo.StartupInfo.wShowWindow = SW_HIDE;
 
-    /* Set up members of the STARTUPINFO structure. */
-    /* This structure specifies the STDIN and STDOUT handles for redirection. */
-    ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
-    siStartInfo.cb = sizeof(STARTUPINFO);
-    siStartInfo.hStdError = hChildStd_OUT_Wr;
-    siStartInfo.hStdOutput = hChildStd_OUT_Wr;
-    siStartInfo.hStdInput = hChildStd_IN_Rd;
-    siStartInfo.dwFlags |= STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    siStartInfo.wShowWindow = SW_HIDE;
+    /* restrict inheritance to the two pipe ends of the child */
+    inherit[0] = hChildStd_IN_Rd;
+    inherit[1] = hChildStd_OUT_Wr;
+    InitializeProcThreadAttributeList(NULL, 1, 0, &attr_size);
+    attr = (LPPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, attr_size);
+    if (attr != NULL
+            && InitializeProcThreadAttributeList(attr, 1, 0, &attr_size)) {
+        if (UpdateProcThreadAttribute(attr, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+                                      inherit, sizeof(inherit), NULL, NULL)) {
+            siStartInfo.StartupInfo.cb = sizeof(STARTUPINFOEXA);
+            siStartInfo.lpAttributeList = attr;
+            flags |= EXTENDED_STARTUPINFO_PRESENT;
+        } else {
+            DeleteProcThreadAttributeList(attr);
+            HeapFree(GetProcessHeap(), 0, attr);
+            attr = NULL;
+        }
+    } else if (attr != NULL) {
+        HeapFree(GetProcessHeap(), 0, attr);
+        attr = NULL;
+    }
 
-    /* Create the child process.  */
-    bSuccess = CreateProcess(NULL,
+    bSuccess = CreateProcessA(NULL,
         szCmdline,     /* command line */
         NULL,          /* process security attributes */
         NULL,          /* primary thread security attributes */
-        TRUE,          /* handles are inherited (C64-EmuDis: was FALSE, then the
-                          child got no stdin/stdout and ffmpeg was "not found") */
-        0,             /* creation flags */
+        TRUE,          /* inherit handles (only those in the list, see above) */
+        flags,         /* creation flags */
         NULL,          /* use parent's environment */
         NULL,          /* use parent's current directory */
-        &siStartInfo,  /* STARTUPINFO pointer */
-        &piProcInfo);  /* receives PROCESS_INFORMATION */
+        &siStartInfo.StartupInfo,
+        &piProcInfo);
 
-    /* If an error occurs, exit */
-    if (!bSuccess) {
-        return -1;
-    } else {
-        /* Close handles to the child process and its primary thread.
-            Some applications might keep these handles to monitor the status
-            of the child process, for example. */
-        /* C64-EmuDis: keep the process handle open, kill_coproc() needs it
-           (it was closed here, so ffmpeg could never be terminated) */
-        *pid = piProcInfo.hProcess;
-        CloseHandle(piProcInfo.hThread);
-
-        /* Close handles to the stdin and stdout pipes no longer needed by the child process.
-            If they are not explicitly closed, there is no way to recognize that the child process has ended. */
-        CloseHandle(hChildStd_OUT_Wr);
-        CloseHandle(hChildStd_IN_Rd);
+    if (attr != NULL) {
+        DeleteProcThreadAttributeList(attr);
+        HeapFree(GetProcessHeap(), 0, attr);
     }
+
+    if (!bSuccess) {
+        log_error(LOG_DEFAULT, "CreateProcess failed (%lu): %s",
+                  (unsigned long)GetLastError(), szCmdline);
+        return -1;
+    }
+
+    *pid = piProcInfo.hProcess;
+    CloseHandle(piProcInfo.hThread);
+
+    /* Close handles to the stdin and stdout pipes no longer needed by the child process.
+        If they are not explicitly closed, there is no way to recognize that the child process has ended. */
+    CloseHandle(hChildStd_OUT_Wr);
+    CloseHandle(hChildStd_IN_Rd);
     return 0;
 }
 

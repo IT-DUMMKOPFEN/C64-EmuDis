@@ -33,7 +33,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/widgets/ffmpegwidget.c` | "video scale" option (1x-4x) in the media recording dialog |
 | `src/arch/shared/uiactions.c/.h` | new action IDs `emudis-*` |
 | `src/arch/shared/archdep_user_*_path.c`, `archdep_default_sysfile_pathlist.c` | own settings/data folder `c64-emudis` (does not touch an installed VICE) |
-| `src/arch/shared/coproc.c` | Windows: quote the whole command for `cmd.exe /C` so paths with spaces work; let the child inherit the pipe handles (ffmpeg was reported as "not found"); keep the process handle so ffmpeg can be terminated |
+| `src/arch/shared/coproc.c` | Windows: quote the whole command for `cmd.exe /C` so paths with spaces work; let the child inherit the pipe handles (ffmpeg was reported as "not found"); keep the process handle so ffmpeg can be terminated; start the child without a console window (it took the keyboard focus while recording) and let it inherit only its pipe handles |
 | `src/arch/shared/macOS-launcher.sh` | `C64-EmuDis.app` starts x64sc |
 | `src/arch/shared/archdep_is_macos_bindist.c` | detect any `*.app` bundle, not only `VICE.app` (ROMs were not found in `C64-EmuDis.app`) |
 | `src/arch/shared/macOS-launcher.c` | missing `<mach-o/dyld.h>` include (build error with newer Xcode) |
