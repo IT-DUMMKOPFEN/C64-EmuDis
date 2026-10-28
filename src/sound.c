@@ -1099,6 +1099,14 @@ sound_t *sound_get_psid(unsigned int channel)
 }
 
 /* open sound device */
+/* C64-EmuDis: parameters the recording device was opened with */
+static int emudis_rec_speed = 0;
+static int emudis_rec_fragsize = 0;
+static int emudis_rec_fragnr = 0;
+static int emudis_rec_channels = 0;
+
+static void sounddev_close(const sound_device_t **dev);
+
 int sound_open(void)
 {
     int c, i, j;
@@ -1287,6 +1295,22 @@ int sound_open(void)
         ui_error("Recording device %s doesn't exist!", recname);
     }
 
+    /* C64-EmuDis: when only the playback device is reopened (device change,
+     * stalled device), keep a running recording instead of initialising the
+     * recording device a second time (that started a second ffmpeg and froze
+     * the emulator). */
+    if (snddata.recdev != NULL) {
+        if (rdev == snddata.recdev
+            && emudis_rec_speed == sample_rate
+            && emudis_rec_fragsize == snddata.fragsize
+            && emudis_rec_fragnr == snddata.fragnr
+            && emudis_rec_channels == snddata.sound_output_channels) {
+            log_message(sound_log, "Keeping recording device `%s' open.", rdev->name);
+            return 0;
+        }
+        sounddev_close(&snddata.recdev);
+    }
+
     if (rdev) {
         if (rdev == pdev) {
             ui_error("Recording device must be different from playback device");
@@ -1315,6 +1339,10 @@ int sound_open(void)
                 resources_set_string("SoundRecordDeviceName", "");
             } else {
                 snddata.recdev = rdev;
+                emudis_rec_speed = sample_rate;
+                emudis_rec_fragsize = snddata.fragsize;
+                emudis_rec_fragnr = snddata.fragnr;
+                emudis_rec_channels = snddata.sound_output_channels;
                 log_message(sound_log, "Opened recording device device `%s'", rdev->name);
             }
         }
@@ -1474,6 +1502,7 @@ void sound_reset(void)
 bool sound_flush(void)
 {
     int c, i, nr, space;
+    tick_t stall_start;
 
     /*
      * It's possible when changing settings via UI to end up
@@ -1570,6 +1599,8 @@ bool sound_flush(void)
      * The 'push against the audio device' sync method depends on this.
      */
 
+    stall_start = tick_now();
+
     while (!warp_mode_enabled) {
 
         if (snddata.playdev->bufferspace) {
@@ -1608,6 +1639,25 @@ bool sound_flush(void)
 
             /* Successful write to audio device, exit loop. */
             mainlock_yield_end();
+            break;
+        }
+
+        /* C64-EmuDis: a device that takes no data for 1.5 seconds has
+         * stalled (e.g. audio device switched). Drop this audio for the
+         * speaker, keep feeding a running recording and reopen the device
+         * instead of freezing the emulation. */
+        if (tick_now_delta(stall_start) > (tick_t)(tick_per_second() + tick_per_second() / 2)) {
+            log_warning(sound_log, "sound device takes no data, reopening it.");
+            if (snddata.recdev) {
+                mainlock_yield_begin();
+                if (snddata.recdev->write(snddata.buffer, nr * snddata.sound_output_channels)) {
+                    sound_error("write to sound device failed.");
+                    mainlock_yield_end();
+                    goto done;
+                }
+                mainlock_yield_end();
+            }
+            sound_playdev_reopen = TRUE;
             break;
         }
 

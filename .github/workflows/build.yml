@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Create a GitHub release with this tag (e.g. v0.2b), empty = no release'
+        description: 'Create a GitHub release with this tag (e.g. v0.3b), empty = no release'
         required: false
         default: ''
 
@@ -351,6 +351,11 @@ jobs:
             | macOS 12+ (Apple Silicon) | `C64-EmuDis-*-macos-arm64.dmg` | drag to Applications, first start: right-click -> Open (not notarized) |
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.AppImage` | **recommended**: `chmod +x C64-EmuDis-*.AppImage`, then start it (GTK 3, GLEW, ffmpeg included) |
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.tar.gz` | small portable folder: extract, run `./C64-EmuDis` (needs GTK 3, GLEW, ffmpeg) |
+
+            **New in 0.3b**
+            - Fixed: recording a video and then dropping a PRG onto the window froze the
+              emulator (macOS)
+            - The emulator no longer waits forever when the sound device stops taking data
 
             **New in 0.2b**
             - Linux AppImage with everything included
