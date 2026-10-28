@@ -22,7 +22,9 @@ plog=$(posix "$log")
 pmp4=$(posix "$mp4")
 rm -f "$plog" "$pmp4"
 
-"$@" -default -logfile "$log" > "$plog.stdout" 2>&1 &
+# -default must come first, it resets everything given before it
+exe="$1"; shift
+"$exe" -default -logfile "$log" "$@" > "$plog.stdout" 2>&1 &
 pid=$!
 status="finished"
 for i in $(seq 1 90); do
@@ -53,6 +55,16 @@ if [ -f "$plog" ]; then
     beats=$(grep -E "t=[0-9]+s clk" "$plog" | tail -n 25 | sed -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
     echo "::warning title=selftest $label log::$msg"
     echo "::warning title=selftest $label heartbeat::$beats"
+    fflog=$(sed -n "s/.*ffmpeg messages go to '\(.*\)'.*/\1/p" "$plog" | tail -n 1 | tr -d '\r')
+    if [ -n "$fflog" ]; then
+        pff=$(posix "$fflog")
+        if [ -s "$pff" ]; then
+            msg=$(tail -n 40 "$pff" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::warning title=selftest $label ffmpeg.log::$msg"
+        else
+            echo "::notice title=selftest $label ffmpeg.log::(empty)"
+        fi
+    fi
 else
     echo "::warning title=selftest $label log::no log file ($plog)"
 fi

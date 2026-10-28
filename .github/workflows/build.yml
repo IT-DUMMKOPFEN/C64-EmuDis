@@ -302,10 +302,13 @@ jobs:
         continue-on-error: true
         run: |
           APP=$(ls -d _build/C64-EmuDis-*-macos-*/C64-EmuDis.app | head -1)
-          packaging/test/selftest.sh macos-coreaudio "$PWD/st-mac1.log" "$PWD/st-mac1.mp4" \
-            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis"
-          packaging/test/selftest.sh macos-wav "$PWD/st-mac2.log" "$PWD/st-mac2.mp4" \
-            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis" -sounddev wav -soundarg "$PWD/st-mac2.wav"
+          # the freeze was intermittent: run the CoreAudio test several times
+          for n in 1 2 3 4; do
+            packaging/test/selftest.sh macos-coreaudio-$n "$PWD/st-mac$n.log" "$PWD/st-mac$n.mp4" \
+              "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis"
+          done
+          packaging/test/selftest.sh macos-wav "$PWD/st-macw.log" "$PWD/st-macw.mp4" \
+            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis" -sounddev wav -soundarg "$PWD/st-macw.wav"
 
       - name: Smoke test report
         if: always()
