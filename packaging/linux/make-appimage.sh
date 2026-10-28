@@ -63,8 +63,20 @@ export PATH="$TOOLS:$PATH"
 
 # --- static ffmpeg for the video recorder --------------------------------
 if [ "$ARCH" = "x86_64" ]; then
-    fetch https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz \
-          "$WORK/ffmpeg.tar.xz"
+    # a stable release build: the "master" builds change options (e.g.
+    # -thread_queue_size is no longer accepted as an input option there)
+    got=0
+    for v in 7.1 7.0; do
+        if fetch "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n$v-latest-linux64-gpl-$v.tar.xz" \
+                 "$WORK/ffmpeg.tar.xz"; then
+            got=1
+            break
+        fi
+    done
+    if [ $got -eq 0 ]; then
+        echo "ERROR: no stable ffmpeg build found"
+        exit 1
+    fi
     mkdir -p "$WORK/ffmpeg"
     tar -xJf "$WORK/ffmpeg.tar.xz" -C "$WORK/ffmpeg" --strip-components=1
     cp "$WORK/ffmpeg/bin/ffmpeg" "$APPDIR/usr/bin/ffmpeg"

@@ -31,6 +31,7 @@
 #include "screenshot.h"
 #include "uiactions.h"
 
+#include "gfxoutputdrv/ffmpegexedrv.h"
 #include "emudis.h"
 
 static log_t st_log = LOG_DEFAULT;
@@ -42,14 +43,19 @@ static gboolean st_tick(gpointer data)
     const char *drop = getenv("EMUDIS_SELFTEST_DROP");
     CLOCK clk;
     int recording;
+    double vs = 0.0, as = 0.0;
 
     seconds++;
 
     mainlock_obtain();
     clk = maincpu_clk;
     recording = screenshot_is_recording();
+    if (recording) {
+        ffmpegexedrv_get_sync_info(&vs, &as);
+    }
     mainlock_release();
-    log_message(st_log, "t=%ds clk=%lu recording=%d", seconds, (unsigned long)clk, recording);
+    log_message(st_log, "t=%ds clk=%lu recording=%d video=%.2fs audio=%.2fs",
+                seconds, (unsigned long)clk, recording, vs, as);
 
     if (seconds == 4) {
         bool ok;

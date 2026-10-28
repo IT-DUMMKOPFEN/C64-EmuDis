@@ -502,32 +502,193 @@ static void prepare_port_numbers(void)
 }
 
 
-/* C64-EmuDis: send to ffmpeg without ever blocking the emulator forever.
- * Returns len on success, -1 on error or when ffmpeg takes no data for
- * FFMPEG_SEND_TIMEOUT_MS (the recording is then stopped). */
-#define FFMPEG_SEND_TIMEOUT_MS 4000
 
+/* C64-EmuDis: asynchronous writers.
+ *
+ * Newer ffmpeg versions (7.x/8.x) keep audio and video in lockstep and stop
+ * reading the stream that is ahead. VICE used to send both streams from the
+ * emulation thread with blocking writes: while it waited for ffmpeg to take
+ * audio, no new video frame was produced, but ffmpeg was waiting for exactly
+ * that video frame -> the emulator froze (e.g. a few seconds after an
+ * autostart during a recording).
+ *
+ * Now each stream has its own writer thread with a queue. The emulator only
+ * appends to the queues and never waits for ffmpeg. If ffmpeg cannot keep up
+ * at all (queue limit reached) or stops taking data, the recording is stopped
+ * cleanly instead of freezing the emulator.
+ */
+#include <pthread.h>
+
+#define FFMPEG_SEND_TIMEOUT_MS  15000                  /* per chunk */
+#define FFW_VIDEO_LIMIT         (192u * 1024u * 1024u)  /* ~12 s of 384x272 frames */
+#define FFW_AUDIO_LIMIT         (32u * 1024u * 1024u)   /* minutes of audio */
+
+typedef struct ffw_chunk_s {
+    struct ffw_chunk_s *next;
+    size_t len;
+    unsigned char data[1];
+} ffw_chunk_t;
+
+typedef struct ffw_s {
+    const char *what;
+    vice_network_socket_t *sock;
+    size_t limit;
+    int running;
+    int finish;
+    pthread_t thread;
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
+    ffw_chunk_t *head;
+    ffw_chunk_t *tail;
+    size_t bytes;
+} ffw_t;
+
+static volatile int ffmpeg_failed = 0;   /* set when ffmpeg stopped taking data */
+static ffw_t ffw_video = { .what = "video", .limit = FFW_VIDEO_LIMIT };
+static ffw_t ffw_audio = { .what = "audio", .limit = FFW_AUDIO_LIMIT };
+
+static void *ffw_thread(void *arg)
+{
+    ffw_t *w = arg;
+
+    for (;;) {
+        ffw_chunk_t *c;
+        ssize_t res;
+        tick_t start;
+        double ms;
+
+        pthread_mutex_lock(&w->lock);
+        while (w->head == NULL && !w->finish) {
+            pthread_cond_wait(&w->cond, &w->lock);
+        }
+        c = w->head;
+        if (c == NULL) {            /* finish requested and queue drained */
+            pthread_mutex_unlock(&w->lock);
+            break;
+        }
+        w->head = c->next;
+        if (w->head == NULL) {
+            w->tail = NULL;
+        }
+        w->bytes -= c->len;
+        pthread_mutex_unlock(&w->lock);
+
+        if (!ffmpeg_failed) {
+            start = tick_now();
+            res = vice_network_send_all(w->sock, c->data, c->len, FFMPEG_SEND_TIMEOUT_MS);
+            ms = (double)tick_now_delta(start) * 1000.0 / (double)tick_per_second();
+            if (res == -2) {
+                log_error(ffmpeg_log, "ffmpeg takes no %s data for %d s, stopping the recording.",
+                          w->what, FFMPEG_SEND_TIMEOUT_MS / 1000);
+                ffmpeg_failed = 1;
+            } else if (res < 0) {
+                log_error(ffmpeg_log, "writing %s data to ffmpeg failed (ffmpeg stopped?).", w->what);
+                ffmpeg_failed = 1;
+            } else if (ms > 1000.0) {
+                log_warning(ffmpeg_log, "ffmpeg was slow taking %s data (%.0f ms).", w->what, ms);
+            }
+        }
+        lib_free(c);
+    }
+    return NULL;
+}
+
+static void ffw_start(ffw_t *w, vice_network_socket_t *sock)
+{
+    if (w->running) {
+        return;
+    }
+    w->sock = sock;
+    w->finish = 0;
+    w->head = w->tail = NULL;
+    w->bytes = 0;
+    pthread_mutex_init(&w->lock, NULL);
+    pthread_cond_init(&w->cond, NULL);
+    if (pthread_create(&w->thread, NULL, ffw_thread, w) != 0) {
+        log_error(ffmpeg_log, "could not start the %s writer thread, writing directly.", w->what);
+        pthread_cond_destroy(&w->cond);
+        pthread_mutex_destroy(&w->lock);
+        return;
+    }
+    w->running = 1;
+}
+
+/* send everything still queued, then stop the writer (before closing the socket) */
+static void ffw_request_stop(ffw_t *w)
+{
+    if (!w->running) {
+        return;
+    }
+    pthread_mutex_lock(&w->lock);
+    w->finish = 1;
+    pthread_cond_signal(&w->cond);
+    pthread_mutex_unlock(&w->lock);
+}
+
+static void ffw_join(ffw_t *w)
+{
+    if (!w->running) {
+        return;
+    }
+    pthread_join(w->thread, NULL);
+    pthread_cond_destroy(&w->cond);
+    pthread_mutex_destroy(&w->lock);
+    w->running = 0;
+    w->sock = NULL;
+}
+
+/* both writers are stopped together: one may need the other to make progress */
+static void ffw_stop_all(void)
+{
+    ffw_request_stop(&ffw_video);
+    ffw_request_stop(&ffw_audio);
+    ffw_join(&ffw_video);
+    ffw_join(&ffw_audio);
+}
+
+/* Queue data for ffmpeg. Returns len, or -1 when the recording must stop. */
 static ssize_t ffmpeg_send(vice_network_socket_t *sock, const void *buf, size_t len, const char *what)
 {
-    ssize_t res;
-    tick_t start = tick_now();
-    double ms;
+    ffw_t *w = (sock == ffw_video.sock) ? &ffw_video : (sock == ffw_audio.sock) ? &ffw_audio : NULL;
+    ffw_chunk_t *c;
 
-    res = vice_network_send_all(sock, buf, len, FFMPEG_SEND_TIMEOUT_MS);
-    ms = (double)tick_now_delta(start) * 1000.0 / (double)tick_per_second();
-    if (res == -2) {
-        log_error(ffmpeg_log, "ffmpeg takes no %s data for %d s, stopping the recording.",
-                  what, FFMPEG_SEND_TIMEOUT_MS / 1000);
+    if (ffmpeg_failed) {
         return -1;
     }
-    if (res < 0) {
-        log_error(ffmpeg_log, "writing %s data to ffmpeg failed (ffmpeg stopped?).", what);
+    if (w == NULL || !w->running) {
+        /* no writer thread: write directly (with timeout) */
+        ssize_t res = vice_network_send_all(sock, buf, len, FFMPEG_SEND_TIMEOUT_MS);
+        if (res < 0) {
+            log_error(ffmpeg_log, "writing %s data to ffmpeg failed.", what);
+            ffmpeg_failed = 1;
+            return -1;
+        }
+        return res;
+    }
+
+    c = lib_malloc(sizeof(ffw_chunk_t) + len);
+    c->next = NULL;
+    c->len = len;
+    memcpy(c->data, buf, len);
+
+    pthread_mutex_lock(&w->lock);
+    if (w->bytes + len > w->limit) {
+        pthread_mutex_unlock(&w->lock);
+        lib_free(c);
+        log_error(ffmpeg_log, "ffmpeg cannot keep up with the %s data, stopping the recording.", what);
+        ffmpeg_failed = 1;
         return -1;
     }
-    if (ms > 250.0) {
-        log_warning(ffmpeg_log, "ffmpeg was slow taking %s data (%.0f ms).", what, ms);
+    if (w->tail != NULL) {
+        w->tail->next = c;
+    } else {
+        w->head = c;
     }
-    return res;
+    w->tail = c;
+    w->bytes += len;
+    pthread_cond_signal(&w->cond);
+    pthread_mutex_unlock(&w->lock);
+    return (ssize_t)len;
 }
 
 static ssize_t write_video_frame(VIDEOFrame *pic)
@@ -744,6 +905,7 @@ static int start_ffmpeg_executable(void)
     int video_connected = 0;
 
     log_resource_values(__FUNCTION__);
+    ffmpeg_failed = 0;
 
     /* C64-EmuDis: without audio channels (sound off / dummy device) record video only */
     if ((audio_has_codec > 0) && (audio_codec != AV_CODEC_ID_NONE) && (audio_input_channels < 1)) {
@@ -918,6 +1080,9 @@ static int start_ffmpeg_executable(void)
             } else {
                 log_message(ffmpeg_log, "ffmpegexedrv: VIDEO connected");
                 video_connected = 1;
+#ifndef VICE_IS_SERVER
+                ffw_start(&ffw_video, ffmpeg_video_socket);
+#endif
                 break;
             }
         }
@@ -955,6 +1120,9 @@ static int start_ffmpeg_executable(void)
             } else {
                 log_message(ffmpeg_log, "ffmpegexedrv: AUDIO connected");
                 audio_connected = 1;
+#ifndef VICE_IS_SERVER
+                ffw_start(&ffw_audio, ffmpeg_audio_socket);
+#endif
                 break;
             }
         }
@@ -1025,6 +1193,7 @@ static int start_ffmpeg_executable(void)
 
 static void close_video_stream(void)
 {
+    ffw_stop_all();
     if (ffmpeg_video_socket != NULL) {
         vice_network_socket_close(ffmpeg_video_socket);
         ffmpeg_video_socket = NULL;
@@ -1033,6 +1202,7 @@ static void close_video_stream(void)
 
 static void close_audio_stream(void)
 {
+    ffw_stop_all();
     if (ffmpeg_audio_socket != NULL) {
         vice_network_socket_close(ffmpeg_audio_socket);
         ffmpeg_audio_socket = NULL;
@@ -1041,6 +1211,7 @@ static void close_audio_stream(void)
 
 static void close_stream(void)
 {
+    ffw_stop_all();
     if (ffmpeg_video_socket != NULL) {
         vice_network_socket_close(ffmpeg_video_socket);
         ffmpeg_video_socket = NULL;
@@ -1168,6 +1339,11 @@ static int ffmpegexe_soundmovie_encode(soundmovie_buffer_t *audio_in)
 
     if (ffmpeg_audio_socket == 0) {
         log_error(ffmpeg_log, "FFMPEG: ffmpegexe_soundmovie_encode ffmpeg_audio_socket is 0 (framecount:%"PRIu64")", audio_input_counter);
+        return 0;
+    }
+
+    if (ffmpeg_failed) {
+        audio_in->used = 0;
         return 0;
     }
 
@@ -1458,6 +1634,9 @@ static int ffmpegexedrv_record(screenshot_t *screenshot)
         return 0;
     }
 #endif
+    if (ffmpeg_failed) {
+        return -1;  /* screenshot_record() stops the recording */
+    }
     double audiotime = (double)audio_input_counter / (double)audio_input_sample_rate;
     DBGFRAMES(("ffmpegexedrv_record(framecount:%lu, audiocount:%lu frametime:%f, audiotime:%f)",
         framecounter, audio_input_counter, frametime, audiotime));
@@ -1635,4 +1814,13 @@ void gfxoutput_init_ffmpegexe(int help)
     get_formats_and_codecs();
 
     gfxoutput_register(&ffmpegexe_drv);
+}
+
+
+/* C64-EmuDis: seconds of video and audio sent to ffmpeg so far */
+void ffmpegexedrv_get_sync_info(double *video_seconds, double *audio_seconds)
+{
+    *video_seconds = (fps > 0.0) ? (double)framecounter / fps : 0.0;
+    *audio_seconds = (audio_input_sample_rate > 0)
+                     ? (double)audio_input_counter / (double)audio_input_sample_rate : 0.0;
 }
