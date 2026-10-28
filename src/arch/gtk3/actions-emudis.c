@@ -186,6 +186,7 @@ void actions_emudis_register(void)
 
 void actions_emudis_setup_ui(void)
 {
+    emudis_selftest_setup();
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SOFTRENDER_TOGGLE,
             (gboolean)(software_renderer_get_choice() == EMUDIS_RENDERER_SOFTWARE));
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_FASTLOAD_TOGGLE,

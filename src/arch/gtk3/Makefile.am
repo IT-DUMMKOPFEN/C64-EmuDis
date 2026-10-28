@@ -62,6 +62,7 @@ libarch_a_SOURCES = \
 	emudis_fontsearch.c \
 	emudis_memview.c \
 	emudis_pages.c \
+	emudis_selftest.c \
 	emudis_sidsearch.c \
 	emudis_snapshots.c \
 	emudis_spritesearch.c \

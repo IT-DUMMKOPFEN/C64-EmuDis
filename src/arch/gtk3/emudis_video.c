@@ -374,3 +374,19 @@ void emudis_video_quick_toggle(void)
         update_buttons();
     }
 }
+
+
+/** \brief  Start recording to a file with default settings (2x, border, audio)
+ *
+ * lock must be held. Used by the self test.
+ */
+bool emudis_video_start_file(const char *filename)
+{
+    return start_recording(filename, 2, true, true, false, 8000);
+}
+
+/** \brief  Stop a running recording (lock must be held) */
+void emudis_video_stop(void)
+{
+    on_stop(NULL, NULL);
+}

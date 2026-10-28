@@ -133,5 +133,8 @@ void emudis_about_show(void);
 bool emudis_fastload_get(void);
 void emudis_fastload_set(bool enabled);
 void emudis_video_quick_toggle(void);
+bool emudis_video_start_file(const char *filename);
+void emudis_video_stop(void);
+void emudis_selftest_setup(void);
 
 #endif

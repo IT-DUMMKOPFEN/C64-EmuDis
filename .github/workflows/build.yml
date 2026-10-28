@@ -70,6 +70,15 @@ jobs:
             [ -f "$f" ] && msg=$(tail -n 30 "$f" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}') && echo "::warning title=$f::$msg"
           done
 
+      - name: Self test (video recording + autostart)
+        continue-on-error: true
+        run: |
+          app=$(ls dist/*.AppImage | head -n 1)
+          export APPIMAGE_EXTRACT_AND_RUN=1
+          xvfb-run -a -s "-screen 0 1280x1024x24" packaging/test/selftest.sh linux-wav \
+            "$PWD/st-linux.log" "$PWD/st-linux.mp4" "$PWD/packaging/test/selftest.prg" -- \
+            "$app" -sounddev wav -soundarg "$PWD/st-linux.wav"
+
       - name: Report build log on failure
         if: failure()
         shell: bash
@@ -160,6 +169,16 @@ jobs:
           cat smoke-win-stdout.log
           ls "$D/bin" | head -50 > smoke-win-files.log
           ls "$D" >> smoke-win-files.log
+
+      - name: Self test (video recording + autostart)
+        continue-on-error: true
+        run: |
+          D=$(ls -d dist/C64-EmuDis-*-windows-x64 | head -1)
+          W=$(cygpath -w "$PWD")
+          packaging/test/selftest.sh windows-default "$W\\st-win1.log" "$W\\st-win1.mp4" \
+            "$W\\packaging\\test\\selftest.prg" -- "$D/bin/C64-EmuDis.exe"
+          packaging/test/selftest.sh windows-wav "$W\\st-win2.log" "$W\\st-win2.mp4" \
+            "$W\\packaging\\test\\selftest.prg" -- "$D/bin/C64-EmuDis.exe" -sounddev wav -soundarg "$W\\st-win2.wav"
 
       - name: Smoke test report
         if: always()
@@ -278,6 +297,15 @@ jobs:
               -limitcycles 4000000 -exitscreenshot "$PWD/smoke-mac.png" -logfile "$PWD/smoke-mac.log" \
               > smoke-mac-stdout.log 2>&1; echo "exit code $?" >> smoke-mac-stdout.log
           cat smoke-mac-stdout.log
+
+      - name: Self test (video recording + autostart)
+        continue-on-error: true
+        run: |
+          APP=$(ls -d _build/C64-EmuDis-*-macos-*/C64-EmuDis.app | head -1)
+          packaging/test/selftest.sh macos-coreaudio "$PWD/st-mac1.log" "$PWD/st-mac1.mp4" \
+            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis"
+          packaging/test/selftest.sh macos-wav "$PWD/st-mac2.log" "$PWD/st-mac2.mp4" \
+            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis" -sounddev wav -soundarg "$PWD/st-mac2.wav"
 
       - name: Smoke test report
         if: always()
