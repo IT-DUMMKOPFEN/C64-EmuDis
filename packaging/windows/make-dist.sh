@@ -99,6 +99,8 @@ cp "$SRC/COPYING" "$DIST/LICENSE.txt"
 cp "$SRC/README.md" "$DIST/README.md"
 cp "$SRC/CREDITS.md" "$DIST/doc/CREDITS.md"
 cp "$SRC/README" "$DIST/doc/VICE-README.txt"
+# the VICE manual as one HTML file (Help -> Browse VICE manual)
+"$SRC/packaging/make-manual.sh" "$SRC" "$DIST/doc/vice-manual.html"
 cat > "$DIST/Start C64-EmuDis.bat" <<'EOF'
 @echo off
 start "" "%~dp0bin\C64-EmuDis.exe" %*

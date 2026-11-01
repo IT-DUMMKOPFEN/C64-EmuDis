@@ -391,6 +391,8 @@ if [ -f doc/vice.pdf ]; then
   echo -n "[manual] "
   cp doc/vice.pdf "$APP_DOCS"
 fi
+# C64-EmuDis: the manual as one HTML file (Help -> Browse VICE manual)
+"$TOP_DIR/packaging/make-manual.sh" "$TOP_DIR" "$APP_DOCS/vice-manual.html"
 
 # any config files from /etc?
 if [ -d etc ]; then

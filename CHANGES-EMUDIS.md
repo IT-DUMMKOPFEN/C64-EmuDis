@@ -6,7 +6,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 ## New files
 | File | Purpose |
 |------|---------|
-| `src/emudis_version.h` | product name, version 0.3b, author |
+| `src/emudis_version.h` | product name, version 0.5b, author |
 | `src/arch/gtk3/emudis.h`, `emudis_common.c` | shared helpers (memory access, VIC-II state, colours, dialogs, heuristics) |
 | `src/arch/gtk3/emudis_memview.c` | live memory viewer |
 | `src/arch/gtk3/emudis_fontsearch.c` | font finder |
@@ -20,6 +20,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/emudis_pages.c` | Help, History and About pages |
 | `src/arch/gtk3/actions-emudis.c/.h` | UI actions for the Tools menu |
 | `src/viciisc/vicii-emudis-overlay.c/.h`, `src/emudis_hooks.h` | "Sprites on screen" overlay (red frames around all sprites) |
+| `src/arch/gtk3/emudis_manual.c`, `packaging/make-manual.sh` | VICE manual as one HTML file in the packages, opened by *Help → Browse VICE manual* (else the online manual) |
+| `src/arch/gtk3/emudis_selftest.c`, `packaging/test/` | self test (video recording + autostart), run by the CI builds |
 | `src/arch/gtk3/software_renderer.c/.h` | Cairo software renderer (no GPU needed), resource `EmuDisRenderer`, options `-softrender`/`-gpurender`, choice saved in `renderer.txt` |
 | `data/hotkeys/hotkeys-emudis.vhk` | default hotkeys for the tools |
 | `packaging/*` | distribution scripts (Linux, Windows, macOS; Windows/macOS based on VICE's bindist scripts) |
@@ -29,7 +31,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | File | Change |
 |------|--------|
 | `src/arch/gtk3/uimachinemenu.c` | new **Tools** menu, C64-EmuDis entries in the Help menu |
-| `src/arch/gtk3/ui.c`, `actions-joystick.c` | window title "C64-EmuDis 0.3b", register the new actions |
+| `src/arch/gtk3/ui.c`, `actions-joystick.c` | window title "C64-EmuDis 0.5b", register the new actions |
+| `src/arch/gtk3/actions-help.c` | *Browse VICE manual* opens the bundled HTML manual or the online manual (the PDF is not built) |
 | `src/arch/gtk3/uimon.c` | monitor window title |
 | `src/arch/gtk3/widgets/ffmpegwidget.c` | "video scale" option (1x-4x) in the media recording dialog |
 | `src/arch/shared/uiactions.c/.h` | new action IDs `emudis-*` |

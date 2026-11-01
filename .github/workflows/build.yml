@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Create a GitHub release with this tag (e.g. v0.3b), empty = no release'
+        description: 'Create a GitHub release with this tag (e.g. v0.5b), empty = no release'
         required: false
         default: ''
 
@@ -43,6 +43,8 @@ jobs:
 
       - name: Package
         run: |
+          # texinfo only now, so configure/make do not start building docs
+          sudo apt-get install -y texinfo > /dev/null
           cd _build
           ../packaging/linux/make-dist.sh .. . ../dist 2>&1 | tee -a ../ci-build.log
 
@@ -154,6 +156,8 @@ jobs:
 
       - name: Package
         run: |
+          # texinfo only now, so configure/make do not start building docs
+          pacman -S --noconfirm --needed texinfo > /dev/null 2>&1 || true
           cd _build
           set -o pipefail
           ../packaging/windows/make-dist.sh .. ../dist 2>&1 | tee -a ../ci-build.log
@@ -242,7 +246,7 @@ jobs:
           done
           brew install python@3.15 >> ci-build.log 2>&1 || true
           pkgs="autoconf automake libtool pkgconf gtk+3 glew dos2unix libpng
-                adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg"
+                adwaita-icon-theme hicolor-icon-theme librsvg ffmpeg texinfo"
           failed=""
           for f in $pkgs; do
             echo "### brew install $f" >> ci-build.log
@@ -383,10 +387,14 @@ jobs:
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.AppImage` | **recommended**: `chmod +x C64-EmuDis-*.AppImage`, then start it (GTK 3, GLEW, ffmpeg included) |
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.tar.gz` | small portable folder: extract, run `./C64-EmuDis` (needs GTK 3, GLEW, ffmpeg) |
 
-            **New in 0.3b**
-            - Fixed: recording a video and then dropping a PRG onto the window froze the
-              emulator (macOS)
-            - The emulator no longer waits forever when the sound device stops taking data
+            **New in 0.5b**
+            - *Tools -> Sprites on screen* (Alt+Shift+E, macOS Cmd+Shift+E): live red frames with
+              numbers around all sprites, cycle exact (multiplexed sprites get a frame for every use)
+            - *Help -> Browse VICE manual* works: the VICE manual is included as HTML
+            - Video recording fixed on all systems: no more freeze with newer ffmpeg versions (e.g.
+              after dropping a PRG during a recording), ffmpeg is found on Windows again and no longer
+              takes the keyboard focus there, fast H.264 encoding, ffmpeg messages in `ffmpeg.log`
+            - The emulator never waits forever for a stalled sound device or ffmpeg
 
             **New in 0.2b**
             - Linux AppImage with everything included

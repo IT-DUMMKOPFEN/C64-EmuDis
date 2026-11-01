@@ -136,5 +136,7 @@ void emudis_video_quick_toggle(void);
 bool emudis_video_start_file(const char *filename);
 void emudis_video_stop(void);
 void emudis_selftest_setup(void);
+bool emudis_open_uri(const char *uri);
+void emudis_show_manual(void);
 
 #endif
