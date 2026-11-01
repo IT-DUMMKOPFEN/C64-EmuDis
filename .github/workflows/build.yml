@@ -78,7 +78,7 @@ jobs:
           app=$(ls dist/*.AppImage | head -n 1)
           export APPIMAGE_EXTRACT_AND_RUN=1
           xvfb-run -a -s "-screen 0 1280x1024x24" packaging/test/selftest.sh linux-wav \
-            "$PWD/st-linux.log" "$PWD/st-linux.mp4" "$PWD/packaging/test/selftest.prg" -- \
+            "$PWD/st-linux.log" "$PWD/st-linux.mp4" "$PWD/packaging/test/selftest.d64" -- \
             "$app" -sounddev wav -soundarg "$PWD/st-linux.wav"
 
       - name: Report build log on failure
@@ -180,9 +180,9 @@ jobs:
           D=$(ls -d dist/C64-EmuDis-*-windows-x64 | head -1)
           W=$(cygpath -w "$PWD")
           packaging/test/selftest.sh windows-default "$W\\st-win1.log" "$W\\st-win1.mp4" \
-            "$W\\packaging\\test\\selftest.prg" -- "$D/bin/C64-EmuDis.exe"
+            "$W\\packaging\\test\\selftest.d64" -- "$D/bin/C64-EmuDis.exe"
           packaging/test/selftest.sh windows-wav "$W\\st-win2.log" "$W\\st-win2.mp4" \
-            "$W\\packaging\\test\\selftest.prg" -- "$D/bin/C64-EmuDis.exe" -sounddev wav -soundarg "$W\\st-win2.wav"
+            "$W\\packaging\\test\\selftest.d64" -- "$D/bin/C64-EmuDis.exe" -sounddev wav -soundarg "$W\\st-win2.wav"
 
       - name: Smoke test report
         if: always()
@@ -309,10 +309,10 @@ jobs:
           # the freeze was intermittent: run the CoreAudio test several times
           for n in 1 2 3 4; do
             packaging/test/selftest.sh macos-coreaudio-$n "$PWD/st-mac$n.log" "$PWD/st-mac$n.mp4" \
-              "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis"
+              "$PWD/packaging/test/selftest.d64" -- "$APP/Contents/MacOS/C64-EmuDis"
           done
           packaging/test/selftest.sh macos-wav "$PWD/st-macw.log" "$PWD/st-macw.mp4" \
-            "$PWD/packaging/test/selftest.prg" -- "$APP/Contents/MacOS/C64-EmuDis" -sounddev wav -soundarg "$PWD/st-macw.wav"
+            "$PWD/packaging/test/selftest.d64" -- "$APP/Contents/MacOS/C64-EmuDis" -sounddev wav -soundarg "$PWD/st-macw.wav"
 
       - name: Smoke test report
         if: always()
@@ -391,6 +391,9 @@ jobs:
             - *Tools -> Sprites on screen* (Alt+Shift+E, macOS Cmd+Shift+E): live red frames with
               numbers around all sprites, cycle exact (multiplexed sprites get a frame for every use)
             - *Help -> Browse VICE manual* works: the VICE manual is included as HTML
+            - Disk and tape images load again: full 1541 emulation (games and demos with fast loaders
+              work) and no loading times anyway - automatic warp while a drive or the datasette loads
+              (*Tools -> Warp while loading*)
             - Video recording fixed on all systems: no more freeze with newer ffmpeg versions (e.g.
               after dropping a PRG during a recording), ffmpeg is found on Windows again and no longer
               takes the keyboard focus there, fast H.264 encoding, ffmpeg messages in `ffmpeg.log`

@@ -1013,7 +1013,7 @@ static const ui_menu_item_t tools_menu[] = {
         .action   = ACTION_EMUDIS_VIDEO_TOGGLE
     },
     UI_MENU_SEPARATOR,
-    {   .label    = "Fast loading (no loading times)",
+    {   .label    = "Warp while loading (no loading times)",
         .type     = UI_MENU_TYPE_ITEM_CHECK,
         .action   = ACTION_EMUDIS_FASTLOAD_TOGGLE
     },

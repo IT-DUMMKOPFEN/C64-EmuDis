@@ -20,7 +20,7 @@ Author: **IT-Dummkopfen** · License: **GPL-2.0-or-later** (see [Why GPL?](#lice
 ### Added by C64-EmuDis (menu **Tools**)
 | Tool | What it does |
 |------|--------------|
-| **No loading times** | True drive emulation off by default, PRGs injected into RAM, warp while autostarting. Toggle: *Tools → Fast loading* |
+| **No loading times** | Automatic warp while a disk drive or the datasette is loading, full 1541 emulation (fast loaders work), PRGs injected into RAM. Toggle: *Tools → Warp while loading* |
 | **Live Memory Viewer** | Hex + PETSCII/screen code/ASCII view or 256×256 memory map, updated up to 50×/s while the C64 runs, change highlighting, editing, search, save/load ranges, VIC-II info |
 | **Font Finder** | Finds character sets in RAM (scored heuristics), hires/multicolor preview, export .bin/.prg/.png, activate in VIC |
 | **Sprite Finder** | Finds sprite data in RAM, shows the 8 hardware sprites, export .bin/.prg/.png/sprite sheet |

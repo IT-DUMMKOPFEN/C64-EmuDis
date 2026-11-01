@@ -107,6 +107,7 @@
 #include "uihotkeys.h"
 #include "uimachinemenu.h"
 #include "software_renderer.h"
+#include "emudis.h"
 #include "uimachinewindow.h"
 #include "uimedia.h"
 #include "uimenu.h"
@@ -2421,8 +2422,11 @@ int ui_resources_init(void)
     if (resources_register_string(resources_string) < 0) {
         return -1;
     }
-    /* C64-EmuDis: renderer choice */
+    /* C64-EmuDis: renderer choice, warp while loading */
     if (software_renderer_resources_init() < 0) {
+        return -1;
+    }
+    if (emudis_autowarp_resources_init() < 0) {
         return -1;
     }
     /* initialize int/bool resources */

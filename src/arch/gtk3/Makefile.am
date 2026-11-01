@@ -57,6 +57,7 @@ libarch_a_SOURCES = \
 	actions-emudis.c \
 	emudis_6502.c \
 	emudis_asmwin.c \
+	emudis_autowarp.c \
 	emudis_common.c \
 	emudis_disasmwin.c \
 	emudis_fontsearch.c \

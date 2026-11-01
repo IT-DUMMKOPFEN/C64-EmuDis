@@ -45,17 +45,19 @@
 
 bool emudis_fastload_get(void)
 {
-    int tde = 1;
-    resources_get_int("Drive8TrueEmulation", &tde);
-    return tde == 0;
+    return emudis_autowarp_get();
 }
 
+/* "No loading times": warp while a drive or the datasette is loading. True
+   drive emulation stays on (full compatibility with fast loaders); the kernal
+   traps are on as well, for drives where the user switches it off. */
 void emudis_fastload_set(bool enabled)
 {
     int unit;
 
+    emudis_autowarp_set(enabled);
     for (unit = 8; unit <= 11; unit++) {
-        resources_set_int_sprintf("Drive%dTrueEmulation", enabled ? 0 : 1, unit);
+        resources_set_int_sprintf("TrapDevice%d", 1, unit);
     }
     if (enabled) {
         resources_set_int("AutostartWarp", 1);
@@ -139,8 +141,8 @@ static void fastload_action(ui_action_map_t *self)
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_FASTLOAD_TOGGLE,
                                              (gboolean)emudis_fastload_get());
     ui_display_statustext(emudis_fastload_get()
-                          ? "Fast loading ON (true drive emulation off)"
-                          : "Fast loading OFF (true drive emulation on)", true);
+                          ? "Warp while loading: ON (no loading times)"
+                          : "Warp while loading: OFF (real loading times)", true);
 }
 
 static void softrender_action(ui_action_map_t *self)
@@ -201,6 +203,7 @@ void actions_emudis_register(void)
 
 void actions_emudis_setup_ui(void)
 {
+    emudis_autowarp_start();
     emudis_selftest_setup();
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SOFTRENDER_TOGGLE,
             (gboolean)(software_renderer_get_choice() == EMUDIS_RENDERER_SOFTWARE));

@@ -104,6 +104,7 @@
 #include "userport/userport_joystick.h"
 #include "vice_gtk3.h"
 
+#include "emudis.h"
 #include "uistatusbar.h"
 
 /* #define DEBUG_STATUSBAR */
@@ -3051,6 +3052,7 @@ void ui_display_tape_counter(int port, int counter)
     ui_sb_state_t *sb_state;
     int index = port;
 
+    emudis_autowarp_note_tape_counter(port, counter);   /* C64-EmuDis */
     sb_state = lock_sb_state();
     sb_state->tape_counter[index] = counter;
     unlock_sb_state();
@@ -3067,6 +3069,7 @@ void ui_display_tape_motor_status(int port, int motor)
     ui_sb_state_t *sb_state;
 
     /* Ok to call from VICE thread */
+    emudis_autowarp_note_tape_motor(port, motor);   /* C64-EmuDis */
     sb_state = lock_sb_state();
 
     if (motor != sb_state->tape_motor_status[port]) {
@@ -3139,6 +3142,9 @@ void ui_display_drive_led(unsigned int drive_number,
         abort();
     }
 
+    /* C64-EmuDis: warp while loading */
+    emudis_autowarp_note_led(drive_number, drive_base, led_pwm1, led_pwm2);
+
     sb_state = lock_sb_state();
     sb_state->current_drive_leds[drive_number][drive_base][0] = led_pwm1;
     sb_state->current_drive_leds[drive_number][drive_base][1] = led_pwm2;
@@ -3167,6 +3173,8 @@ void ui_display_drive_track(unsigned int drive_number,
                             unsigned int half_track_number,
                             unsigned int drive_side)
 {
+    emudis_autowarp_note_track(drive_number);   /* C64-EmuDis: warp while loading */
+
     ui_sb_state_t *sb_state;
     int doubleside, dualdrive;
 

@@ -139,4 +139,15 @@ void emudis_selftest_setup(void);
 bool emudis_open_uri(const char *uri);
 void emudis_show_manual(void);
 
+/* warp while loading (emudis_autowarp.c) */
+void emudis_autowarp_note_led(unsigned int unit, unsigned int drive,
+                              unsigned int pwm1, unsigned int pwm2);
+void emudis_autowarp_note_track(unsigned int unit);
+void emudis_autowarp_note_tape_motor(int port, int motor);
+void emudis_autowarp_note_tape_counter(int port, int counter);
+int  emudis_autowarp_resources_init(void);
+bool emudis_autowarp_get(void);
+void emudis_autowarp_set(bool enabled);
+void emudis_autowarp_start(void);
+
 #endif

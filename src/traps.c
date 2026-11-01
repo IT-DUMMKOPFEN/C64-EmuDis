@@ -122,9 +122,13 @@ static int set_traps_enabled(int val, void *param)
     return 0;
 }
 
+/* C64-EmuDis: kernal traps ("virtual devices") are ON by default for tape and
+   disk drives. True drive emulation is off by default (no loading times), and
+   without traps there was no drive 8 at all ("?DEVICE NOT PRESENT"). Traps are
+   ignored automatically for a drive with true drive emulation. */
 static resource_int_t resources_int[] = {
     /* tape */
-    { "TrapDevice1", 0, RES_EVENT_SAME, NULL,
+    { "TrapDevice1", 1, RES_EVENT_SAME, NULL,
       &traps_enabled_device[1], set_traps_enabled, (void*)1 },
     { "TrapDevice2", 0, RES_EVENT_SAME, NULL,
       &traps_enabled_device[2], set_traps_enabled, (void*)2 },
@@ -138,13 +142,13 @@ static resource_int_t resources_int[] = {
     { "TrapDevice7", 0, RES_EVENT_SAME, NULL,
       &traps_enabled_device[7], set_traps_enabled, (void*)7 },
     /* disk drives */
-    { "TrapDevice8", 0, RES_EVENT_SAME, NULL,
+    { "TrapDevice8", 1, RES_EVENT_SAME, NULL,
       &traps_enabled_device[8], set_traps_enabled, (void*)8 },
-    { "TrapDevice9", 0, RES_EVENT_SAME, NULL,
+    { "TrapDevice9", 1, RES_EVENT_SAME, NULL,
       &traps_enabled_device[9], set_traps_enabled, (void*)9 },
-    { "TrapDevice10", 0, RES_EVENT_SAME, NULL,
+    { "TrapDevice10", 1, RES_EVENT_SAME, NULL,
       &traps_enabled_device[10], set_traps_enabled, (void*)10 },
-    { "TrapDevice11", 0, RES_EVENT_SAME, NULL,
+    { "TrapDevice11", 1, RES_EVENT_SAME, NULL,
       &traps_enabled_device[11], set_traps_enabled, (void*)11 },
     RESOURCE_INT_LIST_END
 };

@@ -398,9 +398,10 @@ static resource_int_t res_drive[] = {
       NULL, set_drive_wobble_frequency, NULL },
     { NULL, DRIVE_WOBBLE_AMPLITUDE_DEFAULT, RES_EVENT_SAME, NULL,
       NULL, set_drive_wobble_amplitude, NULL },
-    /* C64-EmuDis: true drive emulation is off by default (no loading times),
-       virtual device traps are used instead. Can be enabled in the settings. */
-    { NULL, 0, RES_EVENT_STRICT, NULL,
+    /* C64-EmuDis: true drive emulation is on (needed by every disk with its
+       own fast loader); loading times are avoided by "warp while loading"
+       (arch/gtk3/emudis_autowarp.c) */
+    { NULL, 1, RES_EVENT_STRICT, NULL,
       NULL, set_drive_true_emulation, NULL },
     RESOURCE_INT_LIST_END
 };

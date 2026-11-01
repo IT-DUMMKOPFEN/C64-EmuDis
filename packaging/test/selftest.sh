@@ -50,7 +50,7 @@ else
     echo "::warning title=selftest $label::$summary"
 fi
 if [ -f "$plog" ]; then
-    msg=$(grep -E "SELFTEST|FFMPEG|ffmpeg|Coproc|Sound|sound|rror|arning" "$plog" | grep -v "t=[0-9]*s clk" | tail -n 60 \
+    msg=$(grep -E "SELFTEST|FFMPEG|ffmpeg|Coproc|Sound|sound|rror|arning|AUTOSTART: (Starting|Done|Loading program)" "$plog" | grep -v "t=[0-9]*s clk" | tail -n 60 \
           | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
     beats=$(grep -E "t=[0-9]+s clk" "$plog" | tail -n 25 | sed -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
     echo "::warning title=selftest $label log::$msg"

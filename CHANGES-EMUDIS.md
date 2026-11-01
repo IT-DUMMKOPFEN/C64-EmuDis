@@ -20,6 +20,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/emudis_pages.c` | Help, History and About pages |
 | `src/arch/gtk3/actions-emudis.c/.h` | UI actions for the Tools menu |
 | `src/viciisc/vicii-emudis-overlay.c/.h`, `src/emudis_hooks.h` | "Sprites on screen" overlay (red frames around all sprites) |
+| `src/arch/gtk3/emudis_autowarp.c` | "Warp while loading": warp while a drive is busy (LED + head movement) or the tape moves |
 | `src/arch/gtk3/emudis_manual.c`, `packaging/make-manual.sh` | VICE manual as one HTML file in the packages, opened by *Help → Browse VICE manual* (else the online manual) |
 | `src/arch/gtk3/emudis_selftest.c`, `packaging/test/` | self test (video recording + autostart), run by the CI builds |
 | `src/arch/gtk3/software_renderer.c/.h` | Cairo software renderer (no GPU needed), resource `EmuDisRenderer`, options `-softrender`/`-gpurender`, choice saved in `renderer.txt` |
@@ -33,6 +34,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/uimachinemenu.c` | new **Tools** menu, C64-EmuDis entries in the Help menu |
 | `src/arch/gtk3/ui.c`, `actions-joystick.c` | window title "C64-EmuDis 0.5b", register the new actions |
 | `src/arch/gtk3/actions-help.c` | *Browse VICE manual* opens the bundled HTML manual or the online manual (the PDF is not built) |
+| `src/arch/gtk3/uistatusbar.c` | drive LED / head / tape counter states for "warp while loading" |
 | `src/arch/gtk3/uimon.c` | monitor window title |
 | `src/arch/gtk3/widgets/ffmpegwidget.c` | "video scale" option (1x-4x) in the media recording dialog |
 | `src/arch/shared/uiactions.c/.h` | new action IDs `emudis-*` |
@@ -41,7 +43,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/shared/macOS-launcher.sh` | `C64-EmuDis.app` starts x64sc |
 | `src/arch/shared/archdep_is_macos_bindist.c` | detect any `*.app` bundle, not only `VICE.app` (ROMs were not found in `C64-EmuDis.app`) |
 | `src/arch/shared/macOS-launcher.c` | missing `<mach-o/dyld.h>` include (build error with newer Xcode) |
-| `src/drive/drive-resources.c` | true drive emulation off by default (no loading times) |
+| `src/drive/drive-resources.c` | (true drive emulation stays on, as in VICE) |
+| `src/traps.c` | kernal traps on by default for the datasette and drives 8-11 (with true drive emulation switched off there was no drive at all: "?DEVICE NOT PRESENT") |
 | `src/autostart.c`, `src/autostart-prg.h` | no random autostart delay, PRGs injected into RAM by default |
 | `src/gfxoutputdrv/ffmpegexedrv.c` | resource `FFMPEGVideoScale` (nearest neighbour 1x-4x), `-pix_fmt yuv420p`, prefer an ffmpeg next to the emulator, quoted output file name, wait up to 5 s for ffmpeg, robust ffmpeg detection, fixes for recording without audio (crash and dropped frames), frames before ffmpeg is connected are skipped, audio and video are sent by two writer threads with queues (the emulator never waits for ffmpeg; this fixes the freeze with ffmpeg 7/8 after an autostart during a recording), H.264 is encoded with `-preset veryfast -tune zerolatency` (real time on slower machines), a stalled ffmpeg stops the recording instead of freezing the emulator, ffmpeg messages are written to `ffmpeg.log` in the user state folder |
 | `src/gfxoutput.h` | maximum video bitrate raised to 50 Mbit/s (for 4x videos) |

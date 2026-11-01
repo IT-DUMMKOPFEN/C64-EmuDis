@@ -48,11 +48,14 @@ static const char *help_text =
     H2("Quick start")
     LI("Drag a .d64, .t64, .prg, .crt or .tap file onto the window, or use <i>File → Smart attach</i>. "
        "The program starts automatically.")
-    LI("Loading is instant: true drive emulation is <b>off</b> by default, PRG files are injected "
-       "straight into memory and autostart runs in warp mode.")
-    LI("Some copy protected disks and fast loaders need a real 1541. Switch "
-       "<i>Tools → Fast loading (no loading times)</i> off, or enable "
-       "<i>Preferences → Settings → Peripheral devices → Drive → True drive emulation</i>.")
+    LI("No loading times: while a disk drive or the datasette is loading, C64-EmuDis switches to "
+       "warp mode automatically and back to normal speed afterwards. The 1541 is fully emulated "
+       "(true drive emulation), so games and demos with their own fast loaders work.")
+    LI("PRG files are injected straight into memory. Switch the automatic warp off with "
+       "<i>Tools → Warp while loading</i>, e.g. for demos that load while music is playing.")
+    LI("If you switch true drive emulation off (<i>Preferences → Settings → Peripheral devices → "
+       "Drive</i>), drives 8-11 and the datasette work through the kernal traps (instant, but only "
+       "for programs that load with the normal kernal routines).")
     LI("All VICE settings are in <i>Preferences → Settings</i>. C64-EmuDis keeps its own settings "
        "file, so an installed VICE is not affected.")
     LI("<b>White or black emulator screen?</b> Some virtual machines (Parallels, VMware, "
