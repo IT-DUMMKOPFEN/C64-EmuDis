@@ -19,6 +19,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/emudis_video.c` | MP4 video recorder dialog |
 | `src/arch/gtk3/emudis_pages.c` | Help, History and About pages |
 | `src/arch/gtk3/actions-emudis.c/.h` | UI actions for the Tools menu |
+| `src/viciisc/vicii-emudis-overlay.c/.h`, `src/emudis_hooks.h` | "Sprites on screen" overlay (red frames around all sprites) |
 | `src/arch/gtk3/software_renderer.c/.h` | Cairo software renderer (no GPU needed), resource `EmuDisRenderer`, options `-softrender`/`-gpurender`, choice saved in `renderer.txt` |
 | `data/hotkeys/hotkeys-emudis.vhk` | default hotkeys for the tools |
 | `packaging/*` | distribution scripts (Linux, Windows, macOS; Windows/macOS based on VICE's bindist scripts) |
@@ -45,6 +46,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/directx_renderer_impl.cc/.h`, `directx_renderer.c` | WARP fallback, retry without feature level 11.1, HRESULTs in the log, `vice_directx_impl_probe()`, dialog offering the software renderer when DirectX fails |
 | `src/arch/shared/sounddrv/soundcoreaudio.c` | macOS: reopen the sound device when the audio device changes or stops playing (e.g. Bluetooth headset connected) instead of freezing the emulation |
 | `src/socket.c`, `src/vicesocket.h` | `vice_network_send_all()`: complete sends with a timeout |
+| `src/viciisc/vicii-draw-cycle.c`, `src/viciisc/vicii.c` | record sprite start/width per raster line for the overlay |
+| `src/raster/raster-canvas.c/.h` | hook for overlays before a finished frame is shown |
 | `src/sound.c` | keep a running recording when only the playback device is reopened (a second ffmpeg was started, which froze the emulator on macOS when recording and autostarting a PRG); never wait forever for a sound device that takes no data |
 | `src/sound.h` | macOS: default sound fragment size "large" (no stalls when the audio device changes) |
 | `src/mainlock.c/.h` | `mainlock_get_depth()` so tool windows know whether they hold the VICE lock |

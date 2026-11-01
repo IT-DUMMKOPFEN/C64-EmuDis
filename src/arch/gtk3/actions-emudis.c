@@ -35,6 +35,7 @@
 
 #include "emudis.h"
 #include "software_renderer.h"
+#include "emudis_hooks.h"
 #include "actions-emudis.h"
 
 
@@ -160,6 +161,19 @@ static void softrender_action(ui_action_map_t *self)
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SOFTRENDER_TOGGLE, (gboolean)on);
 }
 
+/* "Sprites on screen" overlay, read by the VIC-II code (see emudis_hooks.h) */
+int emudis_sprite_overlay = 0;
+
+static void sprite_overlay_action(ui_action_map_t *self)
+{
+    emudis_sprite_overlay = !emudis_sprite_overlay;
+    vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_SPRITE_OVERLAY_TOGGLE,
+                                             (gboolean)emudis_sprite_overlay);
+    ui_display_statustext(emudis_sprite_overlay
+                          ? "Sprites on screen: ON (red frames around all sprites)"
+                          : "Sprites on screen: OFF", true);
+}
+
 static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_MEMVIEW,         .handler = memview_action,      .uithread = true },
     { .action = ACTION_EMUDIS_FONTS,           .handler = fonts_action,        .uithread = true },
@@ -173,6 +187,7 @@ static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_SCREENSHOT,      .handler = screenshot_action,   .uithread = true },
     { .action = ACTION_EMUDIS_FASTLOAD_TOGGLE, .handler = fastload_action,     .uithread = true },
     { .action = ACTION_EMUDIS_SOFTRENDER_TOGGLE, .handler = softrender_action, .uithread = true },
+    { .action = ACTION_EMUDIS_SPRITE_OVERLAY_TOGGLE, .handler = sprite_overlay_action, .uithread = true },
     { .action = ACTION_EMUDIS_HELP,            .handler = help_action,         .uithread = true },
     { .action = ACTION_EMUDIS_HISTORY,         .handler = history_action,      .uithread = true },
     { .action = ACTION_EMUDIS_ABOUT,           .handler = about_action,        .uithread = true },

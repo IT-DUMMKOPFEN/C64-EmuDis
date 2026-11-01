@@ -31,6 +31,8 @@ libviciisc_a_SOURCES = \
 	vicii-draw.h \
 	vicii-draw-cycle.c \
 	vicii-draw-cycle.h \
+	vicii-emudis-overlay.c \
+	vicii-emudis-overlay.h \
 	vicii-fetch.c \
 	vicii-fetch.h \
 	vicii-irq.c \

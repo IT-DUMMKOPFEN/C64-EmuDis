@@ -978,6 +978,10 @@ static const ui_menu_item_t tools_menu[] = {
         .type     = UI_MENU_TYPE_ITEM_ACTION,
         .action   = ACTION_EMUDIS_SPRITES
     },
+    {   .label    = "Sprites on screen",
+        .type     = UI_MENU_TYPE_ITEM_CHECK,
+        .action   = ACTION_EMUDIS_SPRITE_OVERLAY_TOGGLE
+    },
     {   .label    = "SID finder...",
         .type     = UI_MENU_TYPE_ITEM_ACTION,
         .action   = ACTION_EMUDIS_SIDS

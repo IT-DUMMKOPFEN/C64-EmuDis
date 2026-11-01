@@ -27,6 +27,7 @@ Author: **IT-Dummkopfen** · License: **GPL-2.0-or-later** (see [Why GPL?](#lice
 | **SID Finder** | Finds music players (SID register writes, init/play detection, IRQ callers, PSID headers), live SID register view, export .sid (PSID v2) / .prg |
 | **Assembler** | Two-pass 6502/6510 assembler (ACME/Kick Assembler style, labels, expressions, illegal opcodes), write to RAM, run with SYS, save .prg |
 | **Disassembler** | Listing or re-assemblable ACME / Kick Assembler source with automatic and system labels, live CPU view following the PC |
+| **Sprites on screen** | Live red frames with numbers around every sprite on the screen, cycle exact (multiplexed sprites get a frame for every use), shows invisible sprites too |
 | **Snapshot Manager** | 10 slots with screenshot thumbnails |
 | **Screenshot** | PNG in original resolution with border |
 | **Video Recorder** | MP4 (H.264 + AAC) in original resolution with border, optionally scaled **2×, 3×, 4×** with sharp pixels |
@@ -34,7 +35,7 @@ Author: **IT-Dummkopfen** · License: **GPL-2.0-or-later** (see [Why GPL?](#lice
 
 Default hotkeys (Linux/Windows `Alt+Shift`, macOS `Cmd+Shift`): **M** memory viewer, **F** fonts,
 **G** sprites, **I** SID finder, **A** assembler, **D** disassembler, **K** snapshots,
-**V** start/stop video, **X** screenshot.
+**V** start/stop video, **X** screenshot, **E** sprites on screen.
 
 ---
 

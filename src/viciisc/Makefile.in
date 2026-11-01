@@ -113,11 +113,12 @@ libviciisc_a_LIBADD =
 am_libviciisc_a_OBJECTS = vicii-chip-model.$(OBJEXT) \
 	vicii-cmdline-options.$(OBJEXT) vicii-color.$(OBJEXT) \
 	vicii-cycle.$(OBJEXT) vicii-draw.$(OBJEXT) \
-	vicii-draw-cycle.$(OBJEXT) vicii-fetch.$(OBJEXT) \
-	vicii-irq.$(OBJEXT) vicii-lightpen.$(OBJEXT) \
-	vicii-mem.$(OBJEXT) vicii-phi1.$(OBJEXT) \
-	vicii-resources.$(OBJEXT) vicii-snapshot.$(OBJEXT) \
-	vicii-timing.$(OBJEXT) vicii.$(OBJEXT)
+	vicii-draw-cycle.$(OBJEXT) vicii-emudis-overlay.$(OBJEXT) \
+	vicii-fetch.$(OBJEXT) vicii-irq.$(OBJEXT) \
+	vicii-lightpen.$(OBJEXT) vicii-mem.$(OBJEXT) \
+	vicii-phi1.$(OBJEXT) vicii-resources.$(OBJEXT) \
+	vicii-snapshot.$(OBJEXT) vicii-timing.$(OBJEXT) \
+	vicii.$(OBJEXT)
 libviciisc_a_OBJECTS = $(am_libviciisc_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -138,11 +139,11 @@ am__depfiles_remade = ./$(DEPDIR)/vicii-chip-model.Po \
 	./$(DEPDIR)/vicii-cmdline-options.Po \
 	./$(DEPDIR)/vicii-color.Po ./$(DEPDIR)/vicii-cycle.Po \
 	./$(DEPDIR)/vicii-draw-cycle.Po ./$(DEPDIR)/vicii-draw.Po \
-	./$(DEPDIR)/vicii-fetch.Po ./$(DEPDIR)/vicii-irq.Po \
-	./$(DEPDIR)/vicii-lightpen.Po ./$(DEPDIR)/vicii-mem.Po \
-	./$(DEPDIR)/vicii-phi1.Po ./$(DEPDIR)/vicii-resources.Po \
-	./$(DEPDIR)/vicii-snapshot.Po ./$(DEPDIR)/vicii-timing.Po \
-	./$(DEPDIR)/vicii.Po
+	./$(DEPDIR)/vicii-emudis-overlay.Po ./$(DEPDIR)/vicii-fetch.Po \
+	./$(DEPDIR)/vicii-irq.Po ./$(DEPDIR)/vicii-lightpen.Po \
+	./$(DEPDIR)/vicii-mem.Po ./$(DEPDIR)/vicii-phi1.Po \
+	./$(DEPDIR)/vicii-resources.Po ./$(DEPDIR)/vicii-snapshot.Po \
+	./$(DEPDIR)/vicii-timing.Po ./$(DEPDIR)/vicii.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -442,6 +443,8 @@ libviciisc_a_SOURCES = \
 	vicii-draw.h \
 	vicii-draw-cycle.c \
 	vicii-draw-cycle.h \
+	vicii-emudis-overlay.c \
+	vicii-emudis-overlay.h \
 	vicii-fetch.c \
 	vicii-fetch.h \
 	vicii-irq.c \
@@ -515,6 +518,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-cycle.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-draw-cycle.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-draw.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-emudis-overlay.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-fetch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-irq.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vicii-lightpen.Po@am__quote@ # am--include-marker
@@ -674,6 +678,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/vicii-cycle.Po
 	-rm -f ./$(DEPDIR)/vicii-draw-cycle.Po
 	-rm -f ./$(DEPDIR)/vicii-draw.Po
+	-rm -f ./$(DEPDIR)/vicii-emudis-overlay.Po
 	-rm -f ./$(DEPDIR)/vicii-fetch.Po
 	-rm -f ./$(DEPDIR)/vicii-irq.Po
 	-rm -f ./$(DEPDIR)/vicii-lightpen.Po
@@ -734,6 +739,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/vicii-cycle.Po
 	-rm -f ./$(DEPDIR)/vicii-draw-cycle.Po
 	-rm -f ./$(DEPDIR)/vicii-draw.Po
+	-rm -f ./$(DEPDIR)/vicii-emudis-overlay.Po
 	-rm -f ./$(DEPDIR)/vicii-fetch.Po
 	-rm -f ./$(DEPDIR)/vicii-irq.Po
 	-rm -f ./$(DEPDIR)/vicii-lightpen.Po

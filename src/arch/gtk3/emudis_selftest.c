@@ -33,6 +33,7 @@
 
 #include "gfxoutputdrv/ffmpegexedrv.h"
 #include "emudis.h"
+#include "emudis_hooks.h"
 
 /* set by the FFmpeg driver (see gfxoutputdrv/ffmpegexedrv.h) */
 void (*emudis_ffmpeg_sync_info)(double *video_seconds, double *audio_seconds) = NULL;
@@ -72,6 +73,10 @@ static gboolean st_tick(gpointer data)
         autostart_autodetect(drop, NULL, 0, AUTOSTART_MODE_RUN);
         mainlock_release();
         log_message(st_log, "autostart returned");
+    } else if (seconds == 12) {
+        /* exercise the "Sprites on screen" overlay while recording */
+        emudis_sprite_overlay = 1;
+        log_message(st_log, "sprites on screen overlay on");
     } else if (seconds == 20) {
         mainlock_obtain();
         emudis_video_stop();

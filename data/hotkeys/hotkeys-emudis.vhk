@@ -9,6 +9,7 @@
     emudis-memory-viewer        <Alt><Shift>m
     emudis-font-finder          <Alt><Shift>f
     emudis-sprite-finder        <Alt><Shift>g
+    emudis-sprite-overlay-toggle <Alt><Shift>e
     emudis-sid-finder           <Alt><Shift>i
     emudis-assembler            <Alt><Shift>a
     emudis-disassembler         <Alt><Shift>d
@@ -19,6 +20,7 @@
     emudis-memory-viewer        <Command><Shift>m
     emudis-font-finder          <Command><Shift>f
     emudis-sprite-finder        <Command><Shift>g
+    emudis-sprite-overlay-toggle <Command><Shift>e
     emudis-sid-finder           <Command><Shift>i
     emudis-assembler            <Command><Shift>a
     emudis-disassembler         <Command><Shift>d

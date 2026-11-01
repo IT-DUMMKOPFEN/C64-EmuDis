@@ -105,6 +105,9 @@ inline static void refresh_canvas(raster_t *raster)
     update_area->is_null = 1;
 }
 
+/* C64-EmuDis: called with the finished frame before it is shown (overlays) */
+void (*raster_end_of_frame_overlay_hook)(struct raster_s *raster) = NULL;
+
 void raster_canvas_handle_end_of_frame(raster_t *raster)
 {
     if (video_disabled_mode) {
@@ -117,6 +120,10 @@ void raster_canvas_handle_end_of_frame(raster_t *raster)
 
     if (!raster->canvas->viewport->update_canvas) {
         return;
+    }
+
+    if (raster_end_of_frame_overlay_hook != NULL) {
+        raster_end_of_frame_overlay_hook(raster);
     }
 
     if (raster->dont_cache) {

@@ -91,6 +91,16 @@ static const char *help_text =
     LI("Export one sprite as .bin/.prg/.png, all found sprites as one .bin (64 bytes each, "
        "SpritePad raw style) or as a PNG sprite sheet.")
 
+    H2("Sprites on screen")
+    P("<i>Tools → Sprites on screen</i> (" KBD("Alt+Shift+E") ") draws a red frame with the sprite "
+      "number around every sprite on the emulated screen, live while the C64 runs.")
+    LI("Works cycle exact: a sprite that a program uses several times per frame (sprite multiplexing) "
+       "gets one frame for every use.")
+    LI("Shows sprites you cannot see: sprites in the background colour, behind characters or made "
+       "of transparent pixels only. Frames are one pixel outside the sprite, so the sprite stays visible.")
+    LI("The frames are part of the picture: they also appear in screenshots and videos taken while "
+       "the overlay is on.")
+
     H2("SID Finder")
     P("Finds music players by looking for code that writes to the SID ($D400-$D7FF). The writes are "
       "grouped into regions; for each region C64-EmuDis guesses the <b>init</b> and <b>play</b> "
@@ -145,6 +155,7 @@ static const char *help_text =
     LI(KBD("M") " Live memory viewer     " KBD("F") " Font finder     " KBD("G") " Sprite finder")
     LI(KBD("I") " SID finder     " KBD("A") " Assembler     " KBD("D") " Disassembler")
     LI(KBD("K") " Snapshot manager     " KBD("V") " Start/stop MP4 recording     " KBD("X") " Screenshot")
+    LI(KBD("E") " Sprites on screen (red frames around all sprites)")
     P("The usual VICE hotkeys still work, e.g. " KBD("Alt+W") " warp, " KBD("Alt+P") " pause, "
       KBD("Alt+H") " monitor, " KBD("Alt+D") " fullscreen, " KBD("Alt+F9") " reset (macOS: Cmd instead of Alt).")
 

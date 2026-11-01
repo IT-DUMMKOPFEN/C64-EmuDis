@@ -32,6 +32,7 @@
 #include "snapshot.h"
 #include "vicii-chip-model.h"
 #include "vicii-draw-cycle.h"
+#include "emudis_hooks.h"
 #include "viciitypes.h"
 
 /* disable for debugging */
@@ -94,6 +95,14 @@ static uint8_t sprite_expx_bits = 0;
 static uint8_t sprite_pending_bits = 0;
 static uint8_t sprite_active_bits = 0;
 static uint8_t sprite_halt_bits = 0;
+
+/* C64-EmuDis "Sprites on screen": where each sprite starts on the current
+   line (dbuf pixel position) and how wide it is; -1 = not shown. The values
+   of the finished line are copied to emudis_spr_line_* at the line start. */
+static int emudis_spr_x[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static int emudis_spr_w[8];
+int emudis_spr_line_x[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+int emudis_spr_line_w[8];
 
 /* sbuf shift registers */
 static uint32_t sbuf_reg[8];
@@ -315,7 +324,7 @@ static DRAW_INLINE uint8_t get_trigger_candidates(int xpos)
     return candidate_bits;
 }
 
-static DRAW_INLINE void trigger_sprites(int xpos, uint8_t candidate_bits)
+static DRAW_INLINE void trigger_sprites(int xpos, uint8_t candidate_bits, int pix)
 {
     int s;
 
@@ -334,6 +343,11 @@ static DRAW_INLINE void trigger_sprites(int xpos, uint8_t candidate_bits)
                 sbuf_expx_flops |= m;
                 sbuf_mc_flops |= m;
                 sprite_active_bits |= m;
+                if (emudis_sprite_overlay) {
+                    /* the pixels of this cycle land 8 pixels later in dbuf */
+                    emudis_spr_x[s] = vicii.dbuf_offset + 8 + pix;
+                    emudis_spr_w[s] = (sprite_expx_bits & m) ? 48 : 24;
+                }
             }
         }
     }
@@ -488,28 +502,28 @@ static DRAW_INLINE void draw_sprites8(unsigned int cycle_flags)
 
     /* process and render sprites */
     /* pixel 0 */
-    trigger_sprites(xpos + 0, candidate_bits);
+    trigger_sprites(xpos + 0, candidate_bits, 0);
     draw_sprites(0);
     /* pixel 1 */
-    trigger_sprites(xpos + 1, candidate_bits);
+    trigger_sprites(xpos + 1, candidate_bits, 1);
     draw_sprites(1);
     /* pixel 2 */
     sprite_active_bits &= ~dma_cycle_2;
-    trigger_sprites(xpos + 2, candidate_bits);
+    trigger_sprites(xpos + 2, candidate_bits, 2);
     draw_sprites(2);
     /* pixel 3 */
     sprite_halt_bits |= dma_cycle_0;
-    trigger_sprites(xpos + 3, candidate_bits);
+    trigger_sprites(xpos + 3, candidate_bits, 3);
     draw_sprites(3);
     /* pixel 4 */
     if (spr_en) {
         sprite_pending_bits = vicii.sprite_display_bits;
     }
     update_sprite_data(cycle_flags);
-    trigger_sprites(xpos + 4, candidate_bits);
+    trigger_sprites(xpos + 4, candidate_bits, 4);
     draw_sprites(4);
     /* pixel 5 */
-    trigger_sprites(xpos + 5, candidate_bits);
+    trigger_sprites(xpos + 5, candidate_bits, 5);
     draw_sprites(5);
     /* pixel 6 */
     if (!vicii.color_latency) {
@@ -517,14 +531,14 @@ static DRAW_INLINE void draw_sprites8(unsigned int cycle_flags)
     }
     sprite_pri_bits = vicii.regs[0x1b];
     sprite_expx_bits = vicii.regs[0x1d];
-    trigger_sprites(xpos + 6, candidate_bits);
+    trigger_sprites(xpos + 6, candidate_bits, 6);
     draw_sprites(6);
     /* pixel 7 */
     if (vicii.color_latency) {
         update_sprite_mc_bits_6569();
     }
     sprite_halt_bits &= ~dma_cycle_2;
-    trigger_sprites(xpos + 7, candidate_bits);
+    trigger_sprites(xpos + 7, candidate_bits, 7);
     draw_sprites(7);
 
     /* pipe xpos */
@@ -674,6 +688,14 @@ void vicii_draw_cycle(void)
     /* reset rendering on raster cycle 1 */
     if (vicii.raster_cycle == 1) {
         vicii.dbuf_offset = 0;
+        if (emudis_sprite_overlay) {
+            int s;
+            for (s = 0; s < 8; s++) {
+                emudis_spr_line_x[s] = emudis_spr_x[s];
+                emudis_spr_line_w[s] = emudis_spr_w[s];
+                emudis_spr_x[s] = -1;
+            }
+        }
     }
 
     draw_graphics8(cycle_flags_pipe);

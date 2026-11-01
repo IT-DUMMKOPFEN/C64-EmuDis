@@ -43,6 +43,9 @@ void raster_canvas_init(struct raster_s *raster);
 void raster_canvas_shutdown(struct raster_s *raster);
 
 void raster_canvas_handle_end_of_frame(struct raster_s *raster);
+
+/* C64-EmuDis: called with the finished frame before it is shown */
+extern void (*raster_end_of_frame_overlay_hook)(struct raster_s *raster);
 void raster_canvas_update_all(struct raster_s *raster);
 
 #endif

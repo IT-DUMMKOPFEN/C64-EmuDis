@@ -58,6 +58,7 @@
 #include "vicii-resources.h"
 #include "vicii-timing.h"
 #include "vicii.h"
+#include "vicii-emudis-overlay.h"
 #include "viciitypes.h"
 #include "vsync.h"
 #include "video.h"
@@ -433,6 +434,9 @@ void vicii_raster_draw_handler(void)
                            <= ((unsigned int)vicii.last_displayed_line - vicii.screen_height);
     }
 #endif
+    /* C64-EmuDis: remember the sprites of this line for the overlay */
+    vicii_emudis_overlay_line_end();
+
     raster_line_emulate(&vicii.raster);
 
     vsync_do_end_of_line();
