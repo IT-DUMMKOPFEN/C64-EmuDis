@@ -20,6 +20,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/emudis_pages.c` | Help, History and About pages |
 | `src/arch/gtk3/actions-emudis.c/.h` | UI actions for the Tools menu |
 | `src/viciisc/vicii-emudis-overlay.c/.h`, `src/emudis_hooks.h` | "Sprites on screen" overlay (red frames around all sprites) |
+| `data/common/vice-x64_*.png`, `data/common/vice-x64_1024.svg`, `src/arch/gtk3/Resources/VICE.icns` | new C64-EmuDis application icon (source: `packaging/icon/`) |
+| `src/arch/gtk3/emudis_fullmem.c` | Full memory view: all 64KB, changes, speed 1-100 %, zoom, trainer search |
 | `src/arch/gtk3/emudis_autowarp.c` | "Warp while loading": warp while a drive is busy (LED + head movement) or the tape moves |
 | `src/arch/gtk3/emudis_manual.c`, `packaging/make-manual.sh` | VICE manual as one HTML file in the packages, opened by *Help → Browse VICE manual* (else the online manual) |
 | `src/arch/gtk3/emudis_selftest.c`, `packaging/test/` | self test (video recording + autostart), run by the CI builds |

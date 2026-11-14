@@ -94,6 +94,20 @@ static const char *help_text =
     LI("Export one sprite as .bin/.prg/.png, all found sprites as one .bin (64 bytes each, "
        "SpritePad raw style) or as a PNG sprite sheet.")
 
+    H2("Full memory view")
+    P("<i>Tools → Full memory view</i> (" KBD("Alt+Shift+W") ") shows all 64KB at once: 16 blocks of "
+      "$1000 bytes, one pixel per byte, with the name of each memory area and where the VIC-II "
+      "currently takes the screen, charset, bitmap and sprites from.")
+    LI("Bytes that just changed light up red and fade to yellow; every block shows its changes per second.")
+    LI("<b>C64 speed</b> 1% - 100%, <b>Pause</b> and <b>Next frame</b>: slow the C64 down to see exactly "
+       "what changes when. The previous speed is restored when the window is closed.")
+    LI("Click a block to zoom it (64 x 64 bytes) and see the changed addresses with the values now, "
+       "before the last change and the number of changes.")
+    LI("<b>Trainer search</b>: 1. <i>Start search</i> (e.g. with 3 lives), 2. play until something "
+       "changes (lose a life), 3. <i>Narrow down</i> with <i>decreased</i>. Repeat until only a few "
+       "candidates (green) are left. Select one, enter a value and <i>Freeze</i> it (e.g. infinite lives); "
+       "the matching POKE is shown. Values are decimal; use $ for hex.")
+
     H2("Sprites on screen")
     P("<i>Tools → Sprites on screen</i> (" KBD("Alt+Shift+E") ") draws a red frame with the sprite "
       "number around every sprite on the emulated screen, live while the C64 runs.")
@@ -158,7 +172,7 @@ static const char *help_text =
     LI(KBD("M") " Live memory viewer     " KBD("F") " Font finder     " KBD("G") " Sprite finder")
     LI(KBD("I") " SID finder     " KBD("A") " Assembler     " KBD("D") " Disassembler")
     LI(KBD("K") " Snapshot manager     " KBD("V") " Start/stop MP4 recording     " KBD("X") " Screenshot")
-    LI(KBD("E") " Sprites on screen (red frames around all sprites)")
+    LI(KBD("E") " Sprites on screen (red frames around all sprites)     " KBD("W") " Full memory view")
     P("The usual VICE hotkeys still work, e.g. " KBD("Alt+W") " warp, " KBD("Alt+P") " pause, "
       KBD("Alt+H") " monitor, " KBD("Alt+D") " fullscreen, " KBD("Alt+F9") " reset (macOS: Cmd instead of Alt).")
 
@@ -283,6 +297,7 @@ static char *about_text(void)
         LI("<b>C64 Pro Mono</b> font - © Style (style64.org), free font license")
         LI("<b>PetMe</b> fonts - © Kreative Software, Relay Fonts Free Use License")
         LI("<b>Colodore</b> palette (used in the tool previews) - Philip \"Pepto\" Timmermann")
+        LI("<b>Application icon</b> - original artwork by IT-Dummkopfen, GPL-2.0-or-later")
 
         H2("Inspiration (ideas only, no code was copied)")
         LI("emudore by Mario Ballano - Apache-2.0")

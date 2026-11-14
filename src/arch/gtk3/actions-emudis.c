@@ -117,6 +117,7 @@ static void take_screenshot(void)
 /* ------------------------------------------------------------------------ */
 
 static void memview_action(ui_action_map_t *self)      { with_lock(emudis_memview_show); }
+static void fullmem_action(ui_action_map_t *self)      { with_lock(emudis_fullmem_show); }
 static void fonts_action(ui_action_map_t *self)        { with_lock(emudis_fontsearch_show); }
 static void sprites_action(ui_action_map_t *self)      { with_lock(emudis_spritesearch_show); }
 static void sids_action(ui_action_map_t *self)         { with_lock(emudis_sidsearch_show); }
@@ -178,6 +179,7 @@ static void sprite_overlay_action(ui_action_map_t *self)
 
 static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_MEMVIEW,         .handler = memview_action,      .uithread = true },
+    { .action = ACTION_EMUDIS_FULLMEM,         .handler = fullmem_action,      .uithread = true },
     { .action = ACTION_EMUDIS_FONTS,           .handler = fonts_action,        .uithread = true },
     { .action = ACTION_EMUDIS_SPRITES,         .handler = sprites_action,      .uithread = true },
     { .action = ACTION_EMUDIS_SIDS,            .handler = sids_action,         .uithread = true },

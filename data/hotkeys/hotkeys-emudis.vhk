@@ -7,6 +7,7 @@
 
 !if !MACOS
     emudis-memory-viewer        <Alt><Shift>m
+    emudis-full-memory-view     <Alt><Shift>w
     emudis-font-finder          <Alt><Shift>f
     emudis-sprite-finder        <Alt><Shift>g
     emudis-sprite-overlay-toggle <Alt><Shift>e
@@ -18,6 +19,7 @@
     emudis-screenshot           <Alt><Shift>x
 !else
     emudis-memory-viewer        <Command><Shift>m
+    emudis-full-memory-view     <Command><Shift>w
     emudis-font-finder          <Command><Shift>f
     emudis-sprite-finder        <Command><Shift>g
     emudis-sprite-overlay-toggle <Command><Shift>e

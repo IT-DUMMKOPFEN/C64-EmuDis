@@ -61,6 +61,7 @@ libarch_a_SOURCES = \
 	emudis_common.c \
 	emudis_disasmwin.c \
 	emudis_fontsearch.c \
+	emudis_fullmem.c \
 	emudis_manual.c \
 	emudis_memview.c \
 	emudis_pages.c \

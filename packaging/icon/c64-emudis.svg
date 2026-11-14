@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- C64-EmuDis application icon - original artwork by IT-Dummkopfen, GPL-2.0-or-later -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b80e6"/>
+      <stop offset="1" stop-color="#5a4fbf"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d32a0"/>
+      <stop offset="1" stop-color="#2a2177"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8dcc0"/>
+      <stop offset="1" stop-color="#bfae8a"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8987a"/>
+      <stop offset="1" stop-color="#8a7b60"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="round"><rect x="32" y="32" width="960" height="960" rx="210"/></clipPath>
+  </defs>
+
+  <!-- light blue frame (the C64 border colour) -->
+  <rect x="32" y="32" width="960" height="960" rx="210" fill="url(#bg)"/>
+
+  <g clip-path="url(#round)">
+    <!-- dark blue screen -->
+    <rect x="120" y="118" width="784" height="560" rx="70" fill="url(#screen)"/>
+    <!-- READY. and the cursor, drawn as 8x8 pixel blocks -->
+    <g fill="#9d95f0">
+      <!-- R -->
+      <rect x="180" y="190" width="40" height="80"/><rect x="220" y="190" width="30" height="16"/>
+      <rect x="250" y="206" width="16" height="24"/><rect x="220" y="226" width="30" height="16"/>
+      <rect x="240" y="242" width="16" height="28"/>
+      <!-- E -->
+      <rect x="290" y="190" width="18" height="80"/><rect x="308" y="190" width="52" height="16"/>
+      <rect x="308" y="222" width="40" height="16"/><rect x="308" y="254" width="52" height="16"/>
+      <!-- A -->
+      <rect x="384" y="206" width="18" height="64"/><rect x="448" y="206" width="18" height="64"/>
+      <rect x="400" y="190" width="50" height="16"/><rect x="400" y="230" width="50" height="16"/>
+      <!-- D -->
+      <rect x="490" y="190" width="18" height="80"/><rect x="508" y="190" width="38" height="16"/>
+      <rect x="508" y="254" width="38" height="16"/><rect x="546" y="206" width="18" height="48"/>
+      <!-- Y -->
+      <rect x="588" y="190" width="18" height="34"/><rect x="646" y="190" width="18" height="34"/>
+      <rect x="604" y="222" width="44" height="16"/><rect x="617" y="236" width="18" height="34"/>
+      <!-- . -->
+      <rect x="690" y="252" width="18" height="18"/>
+      <!-- cursor -->
+      <rect x="180" y="300" width="80" height="80"/>
+    </g>
+
+    <!-- rainbow stripes behind the computer -->
+    <g transform="rotate(-24 512 640)">
+      <rect x="-200" y="430" width="1500" height="44" fill="#e8463c"/>
+      <rect x="-200" y="474" width="1500" height="44" fill="#f39a2b"/>
+      <rect x="-200" y="518" width="1500" height="44" fill="#f5d33b"/>
+      <rect x="-200" y="562" width="1500" height="44" fill="#57c35a"/>
+      <rect x="-200" y="606" width="1500" height="44" fill="#3fa2e4"/>
+    </g>
+
+    <!-- the computer: a wedge shaped retro home computer -->
+    <g>
+      <!-- shadow -->
+      <ellipse cx="512" cy="905" rx="400" ry="38" fill="#000000" opacity="0.25"/>
+      <!-- top (rounded wedge) -->
+      <path d="M150 700 Q160 640 230 632 L794 632 Q864 640 874 700 L900 820 L124 820 Z" fill="url(#body)"/>
+      <!-- front face -->
+      <path d="M124 820 L900 820 L900 872 Q900 892 880 892 L144 892 Q124 892 124 872 Z" fill="url(#front)"/>
+      <!-- keyboard well -->
+      <path d="M210 668 L760 668 L780 800 L190 800 Z" fill="#4a3f33"/>
+      <!-- key rows -->
+      <g fill="#6d5f4e">
+        <g id="row1">
+          <rect x="222" y="680" width="34" height="22" rx="4"/><rect x="262" y="680" width="34" height="22" rx="4"/>
+          <rect x="302" y="680" width="34" height="22" rx="4"/><rect x="342" y="680" width="34" height="22" rx="4"/>
+          <rect x="382" y="680" width="34" height="22" rx="4"/><rect x="422" y="680" width="34" height="22" rx="4"/>
+          <rect x="462" y="680" width="34" height="22" rx="4"/><rect x="502" y="680" width="34" height="22" rx="4"/>
+          <rect x="542" y="680" width="34" height="22" rx="4"/><rect x="582" y="680" width="34" height="22" rx="4"/>
+          <rect x="622" y="680" width="34" height="22" rx="4"/><rect x="662" y="680" width="34" height="22" rx="4"/>
+          <rect x="702" y="680" width="40" height="22" rx="4"/>
+        </g>
+        <g transform="translate(-6 30)">
+          <rect x="222" y="680" width="50" height="22" rx="4"/><rect x="278" y="680" width="34" height="22" rx="4"/>
+          <rect x="318" y="680" width="34" height="22" rx="4"/><rect x="358" y="680" width="34" height="22" rx="4"/>
+          <rect x="398" y="680" width="34" height="22" rx="4"/><rect x="438" y="680" width="34" height="22" rx="4"/>
+          <rect x="478" y="680" width="34" height="22" rx="4"/><rect x="518" y="680" width="34" height="22" rx="4"/>
+          <rect x="558" y="680" width="34" height="22" rx="4"/><rect x="598" y="680" width="34" height="22" rx="4"/>
+          <rect x="638" y="680" width="34" height="22" rx="4"/><rect x="678" y="680" width="74" height="22" rx="4"/>
+        </g>
+        <g transform="translate(-12 60)">
+          <rect x="222" y="680" width="64" height="22" rx="4"/><rect x="292" y="680" width="34" height="22" rx="4"/>
+          <rect x="332" y="680" width="34" height="22" rx="4"/><rect x="372" y="680" width="34" height="22" rx="4"/>
+          <rect x="412" y="680" width="34" height="22" rx="4"/><rect x="452" y="680" width="34" height="22" rx="4"/>
+          <rect x="492" y="680" width="34" height="22" rx="4"/><rect x="532" y="680" width="34" height="22" rx="4"/>
+          <rect x="572" y="680" width="34" height="22" rx="4"/><rect x="612" y="680" width="34" height="22" rx="4"/>
+          <rect x="652" y="680" width="112" height="22" rx="4"/>
+        </g>
+        <!-- space bar -->
+        <rect x="320" y="770" width="330" height="22" rx="5"/>
+      </g>
+      <!-- function keys on the right -->
+      <g fill="#c8823a">
+        <rect x="800" y="684" width="46" height="24" rx="4"/>
+        <rect x="806" y="716" width="46" height="24" rx="4"/>
+        <rect x="812" y="748" width="46" height="24" rx="4"/>
+      </g>
+      <!-- power LED -->
+      <rect x="170" y="700" width="22" height="10" rx="3" fill="#ff4a3a"/>
+      <!-- gloss -->
+      <path d="M150 700 Q160 640 230 632 L794 632 Q864 640 874 700 L880 728 L144 728 Z" fill="url(#gloss)"/>
+    </g>
+  </g>
+</svg>

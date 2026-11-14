@@ -969,6 +969,10 @@ static const ui_menu_item_t tools_menu[] = {
         .type     = UI_MENU_TYPE_ITEM_ACTION,
         .action   = ACTION_EMUDIS_MEMVIEW
     },
+    {   .label    = "Full memory view...",
+        .type     = UI_MENU_TYPE_ITEM_ACTION,
+        .action   = ACTION_EMUDIS_FULLMEM
+    },
     UI_MENU_SEPARATOR,
     {   .label    = "Font finder...",
         .type     = UI_MENU_TYPE_ITEM_ACTION,

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- C64-EmuDis application icon (small sizes) - original artwork by IT-Dummkopfen, GPL-2.0-or-later -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b80e6"/>
+      <stop offset="1" stop-color="#5a4fbf"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d32a0"/>
+      <stop offset="1" stop-color="#2a2177"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8dcc0"/>
+      <stop offset="1" stop-color="#bfae8a"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8987a"/>
+      <stop offset="1" stop-color="#8a7b60"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="round"><rect x="32" y="32" width="960" height="960" rx="210"/></clipPath>
+  </defs>
+
+  <!-- light blue frame (the C64 border colour) -->
+  <rect x="32" y="32" width="960" height="960" rx="210" fill="url(#bg)"/>
+
+  <g clip-path="url(#round)">
+    <!-- dark blue screen -->
+    <rect x="120" y="118" width="784" height="560" rx="70" fill="url(#screen)"/>
+    <!-- READY. and the cursor, drawn as 8x8 pixel blocks -->
+    <g fill="#9d95f0">
+      <rect x="190" y="200" width="150" height="150"/>
+    </g>
+
+    <!-- rainbow stripes behind the computer -->
+    <g transform="rotate(-24 512 640)">
+      <rect x="-200" y="430" width="1500" height="44" fill="#e8463c"/>
+      <rect x="-200" y="474" width="1500" height="44" fill="#f39a2b"/>
+      <rect x="-200" y="518" width="1500" height="44" fill="#f5d33b"/>
+      <rect x="-200" y="562" width="1500" height="44" fill="#57c35a"/>
+      <rect x="-200" y="606" width="1500" height="44" fill="#3fa2e4"/>
+    </g>
+
+    <!-- the computer: a wedge shaped retro home computer -->
+    <g>
+      <!-- shadow -->
+      <ellipse cx="512" cy="905" rx="400" ry="38" fill="#000000" opacity="0.25"/>
+      <!-- top (rounded wedge) -->
+      <path d="M150 700 Q160 640 230 632 L794 632 Q864 640 874 700 L900 820 L124 820 Z" fill="url(#body)"/>
+      <!-- front face -->
+      <path d="M124 820 L900 820 L900 872 Q900 892 880 892 L144 892 Q124 892 124 872 Z" fill="url(#front)"/>
+      <!-- keyboard well -->
+      <path d="M210 668 L760 668 L780 800 L190 800 Z" fill="#4a3f33"/>
+      <!-- function keys on the right -->
+      <g fill="#c8823a">
+        <rect x="800" y="684" width="46" height="24" rx="4"/>
+        <rect x="806" y="716" width="46" height="24" rx="4"/>
+        <rect x="812" y="748" width="46" height="24" rx="4"/>
+      </g>
+      <!-- power LED -->
+      <rect x="170" y="700" width="22" height="10" rx="3" fill="#ff4a3a"/>
+      <!-- gloss -->
+      <path d="M150 700 Q160 640 230 632 L794 632 Q864 640 874 700 L880 728 L144 728 Z" fill="url(#gloss)"/>
+    </g>
+  </g>
+</svg>

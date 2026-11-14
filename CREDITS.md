@@ -20,6 +20,7 @@
 | FFmpeg (external program, video recording) | ffmpeg.org | LGPL-2.1-or-later / GPL-2.0-or-later (depending on build) |
 | C64 Pro Mono font | Style, style64.org | Style free font license |
 | PetMe fonts | Kreative Software | Relay Fonts Free Use License (see `data/common/PetMe-FreeLicense.txt`) |
+| Application icon (retro home computer, `packaging/icon/`) | original artwork, © 2026 IT-Dummkopfen | GPL-2.0-or-later |
 | Colodore palette (tool previews) | Philip "Pepto" Timmermann | free to use |
 
 Windows builds additionally contain the MSYS2 runtime DLLs of the libraries above; macOS builds

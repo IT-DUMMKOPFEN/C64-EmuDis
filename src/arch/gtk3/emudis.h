@@ -117,6 +117,7 @@ int         emudis_score_sprite(const uint8_t *d);
 
 /* ---- windows ---- */
 void emudis_memview_show(void);
+void emudis_fullmem_show(void);
 void emudis_fontsearch_show(void);
 void emudis_spritesearch_show(void);
 void emudis_sidsearch_show(void);
