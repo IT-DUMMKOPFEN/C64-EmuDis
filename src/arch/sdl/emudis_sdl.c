@@ -21,6 +21,7 @@
 #include "vice.h"
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -196,6 +197,60 @@ int emudis_sdl_handle_user_event(SDL_Event *e)
             break;
     }
     return 1;
+}
+
+/* --- stdout/stderr to logcat ------------------------------------------- */
+
+/* VICE writes its log to stdout, which goes nowhere on Android: send it to
+   logcat (tag "VICE") */
+
+#include <pthread.h>
+#include <unistd.h>
+
+static int log_pipe[2] = { -1, -1 };
+
+static void *log_thread(void *arg)
+{
+    char buf[1024];
+    size_t used = 0;
+    ssize_t n;
+
+    while ((n = read(log_pipe[0], buf + used, sizeof buf - 1 - used)) > 0) {
+        char *start = buf, *nl;
+        used += (size_t)n;
+        buf[used] = 0;
+        while ((nl = strchr(start, '\n')) != NULL) {
+            *nl = 0;
+            __android_log_write(ANDROID_LOG_INFO, "VICE", start);
+            start = nl + 1;
+        }
+        used = (size_t)(buf + used - start);
+        memmove(buf, start, used);
+        if (used == sizeof buf - 1) {
+            buf[used] = 0;
+            __android_log_write(ANDROID_LOG_INFO, "VICE", buf);
+            used = 0;
+        }
+    }
+    return NULL;
+}
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+    pthread_t t;
+
+    if (log_pipe[0] < 0 && pipe(log_pipe) == 0) {
+        setvbuf(stdout, NULL, _IOLBF, 0);
+        setvbuf(stderr, NULL, _IONBF, 0);
+        dup2(log_pipe[1], 1);
+        dup2(log_pipe[1], 2);
+        if (pthread_create(&t, NULL, log_thread, NULL) == 0) {
+            pthread_detach(t);
+        }
+    }
+    return JNI_VERSION_1_4;
 }
 
 /* --- JNI ------------------------------------------------------------------ */

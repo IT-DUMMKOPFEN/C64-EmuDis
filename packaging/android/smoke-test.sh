@@ -48,7 +48,7 @@ adb shell settings put system accelerometer_rotation 0
 adb shell settings put system user_rotation 0
 adb shell am start -n $PKG/.EmuActivity
 sleep 25
-adb logcat -d | grep -E "C64-EmuDis|SDL|AndroidRuntime|DEBUG|$PKG" | tail -n 60
+adb logcat -d -v brief "VICE:V" "SDL:V" "C64-EmuDis:V" "libc:V" "DEBUG:V" "AndroidRuntime:V" "*:F" | tail -n 250
 shot portrait
 
 # KEYS button: top left in portrait (first of six buttons in the top row)
