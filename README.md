@@ -51,6 +51,7 @@ Ready-to-run builds for all three platforms are produced by GitHub Actions
 | macOS 12+ (Apple Silicon) | `C64-EmuDis-0.5b-macos-arm64.dmg` | drag to Applications; first start: right-click → *Open* (not notarized); ffmpeg included |
 | Linux (x86_64) | `C64-EmuDis-0.5b-linux-x86_64.AppImage` | **recommended**: `chmod +x` and start it; GTK 3, GLEW and ffmpeg included |
 | Linux (x86_64) | `C64-EmuDis-0.5b-linux-x86_64.tar.gz` | small portable folder: extract, run `./C64-EmuDis`; needs GTK 3, GLEW and `ffmpeg` (for video) from your distribution |
+| Android 7+ (arm64) | `C64-EmuDis-0.5b-android-arm64.apk` | **test version**: install the APK (allow "unknown apps"); touch keyboard (KEYS, top left), touch joystick for port 1 or 2 (PORT), LOAD for disk/tape/PRG files, MENU for the VICE menu |
 
 If the emulator screen stays white or black (typical for virtual machines such as Parallels on a
 Mac, VMware or VirtualBox), use the **software renderer**: *Tools → Software renderer*, the option
@@ -93,6 +94,7 @@ See [`.github/workflows/build.yml`](.github/workflows/build.yml) and
 | `src/arch/gtk3/actions-emudis.c` | menu/hotkey actions |
 | `src/emudis_version.h` | name, version, author |
 | `packaging/` | distribution scripts for Linux, Windows and macOS |
+| `android/`, `src/arch/sdl/emudis_sdl.c` | Android app (touch controls around VICE's SDL2 UI) |
 | everything else | VICE 3.10 (lightly modified, see [CHANGES-EMUDIS.md](CHANGES-EMUDIS.md)) |
 
 ---

@@ -28,6 +28,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/software_renderer.c/.h` | Cairo software renderer (no GPU needed), resource `EmuDisRenderer`, options `-softrender`/`-gpurender`, choice saved in `renderer.txt` |
 | `data/hotkeys/hotkeys-emudis.vhk` | default hotkeys for the tools |
 | `packaging/*` | distribution scripts (Linux, Windows, macOS; Windows/macOS based on VICE's bindist scripts) |
+| `android/`, `packaging/android/build-native.sh`, `.github/workflows/android.yml` | Android app: VICE x64sc with the SDL2 UI plus touch keyboard overlay, touch joystick (port 1/2) and buttons |
+| `src/arch/sdl/emudis_sdl.c/.h` | SDL UI: C64-EmuDis hooks and the Android JNI bridge (touch controls as SDL user events) |
 | `.github/workflows/build.yml` | CI builds for all three platforms |
 
 ## Changed VICE files
@@ -40,6 +42,8 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/gtk3/uimon.c` | monitor window title |
 | `src/arch/gtk3/widgets/ffmpegwidget.c` | "video scale" option (1x-4x) in the media recording dialog |
 | `src/arch/shared/uiactions.c/.h` | new action IDs `emudis-*` |
+| `src/arch/shared/archdep_get_vice_datadir.c` | Android: data directory from `EMUDIS_DATADIR` (set by the app) |
+| `src/arch/sdl/ui.c`, `src/arch/sdl/Makefile.am` | SDL UI: handle the Android touch control events |
 | `src/arch/shared/archdep_user_*_path.c`, `archdep_default_sysfile_pathlist.c` | own settings/data folder `c64-emudis` (does not touch an installed VICE) |
 | `src/arch/shared/coproc.c` | Windows: quote the whole command for `cmd.exe /C` so paths with spaces work; let the child inherit the pipe handles (ffmpeg was reported as "not found"); keep the process handle so ffmpeg can be terminated; start the child without a console window (it took the keyboard focus while recording) and let it inherit only its pipe handles |
 | `src/arch/shared/macOS-launcher.sh` | `C64-EmuDis.app` starts x64sc |
