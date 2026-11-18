@@ -55,6 +55,21 @@ shot portrait
 read -r W H < <(size)
 adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 3
+# type HI on the C64 keyboard (layout as in EmuActivity/C64KeyboardView)
+python3 - "$W" "$H" > smoke/keys.txt <<'PY'
+import sys
+w, h = float(sys.argv[1]), float(sys.argv[2])
+bw = w / 6; bar = min(bw * 0.62, h * 0.08); m = bw * 0.05
+top = bar + m + min(w / 1.32, h * 0.45)
+kh = min(h - top, w * 5 / 18 * 1.6); uw = w / 18; uh = kh / 5
+for kx, ky in ((7.5, 2.5), (9.0, 1.5), (14.0, 2.5)):   # H, I, RETURN
+    print(int(kx * uw), int(top + ky * uh))
+PY
+while read -r X Y; do
+    adb shell input tap "$X" "$Y"
+    sleep 1
+done < smoke/keys.txt
+sleep 2
 shot portrait-keyboard
 adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 1
