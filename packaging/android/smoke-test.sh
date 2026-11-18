@@ -97,7 +97,7 @@ adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 3
 echo "=== C64 keyboard shown, Android keyboard: $(ime)"
 # m SPACE SHIFT+4 ($) 1 0 0 0 RETURN  ->  "m $1000"
-taps 9.0,3.5 8.0,4.5 1.75,3.5 4.5,0.5 1.5,0.5 11.5,0.5 11.5,0.5 11.5,0.5 15.0,2.5
+taps 9.0,3.5 8.0,4.5 1.75,3.5 4.5,0.5 1.5,0.5 10.5,0.5 10.5,0.5 10.5,0.5 15.0,2.5
 sleep 4
 shot monitor-c64keys
 taps 4.0,3.5 15.0,2.5                   # X, RETURN: leave the monitor
@@ -112,7 +112,7 @@ shot landscape
 
 adb logcat -d > smoke/logcat.txt
 echo "=== logcat (app, SDL, crashes)"
-grep -E "EmuDisKey|AndroidRuntime|F DEBUG|F libc" smoke/logcat.txt | tail -n 80
+grep -E "EmuDisMon|EmuDisKey|AndroidRuntime|F DEBUG|F libc" smoke/logcat.txt | tail -n 80
 # SDL shows its errors (e.g. a missing library) in a dialog
 adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
 adb shell cat /sdcard/ui.xml > smoke/ui.xml 2>/dev/null

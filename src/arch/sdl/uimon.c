@@ -29,6 +29,11 @@
 
 #include "vice.h"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#include <stdio.h>
+#endif
+
 #include "charset.h"
 #include "console.h"
 #if defined(UNIX_COMPILE)
@@ -426,6 +431,17 @@ char *uimon_get_in(char **ppchCommandLine, const char *prompt)
         x_off = sdl_ui_print(prompt, 0, y);
         input = sdl_ui_readline(NULL, x_off, y);
         sdl_ui_scroll_screen_up();
+#ifdef __ANDROID__
+        if (input != NULL) {
+            char hex[256];
+            size_t n, k = 0;
+            for (n = 0; input[n] != 0 && k + 4 < sizeof hex; n++) {
+                k += (size_t)snprintf(hex + k, sizeof hex - k, "%02x ", (unsigned char)input[n]);
+            }
+            hex[k] = 0;
+            __android_log_print(ANDROID_LOG_DEBUG, "EmuDisMon", "input '%s' [%s]", input, hex);
+        }
+#endif
 
         return input;
     } else {
