@@ -66,6 +66,10 @@ static const int using_ui_monitor = 1;
 void uimon_window_close(void)
 {
     if (using_ui_monitor) {
+        sdl_ui_keep_text_input = 0;
+#if defined(USE_SDL2UI) && defined(__ANDROID__)
+        SDL_StopTextInput();    /* hide the Android keyboard */
+#endif
         if (menu_draw) {
             sdl_ui_activate_post_action();
         }
@@ -88,6 +92,7 @@ console_t *uimon_window_open(bool display_now)
 #endif
 
     if (using_ui_monitor) {
+        sdl_ui_keep_text_input = 1;
         sdl_ui_activate_pre_action();
         sdl_ui_init_draw_params(sdl_active_canvas);
         sdl_ui_clear();

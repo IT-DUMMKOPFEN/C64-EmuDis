@@ -1026,7 +1026,13 @@ void mon_exit(void)
 */
 void mon_quit(void)
 {
+#ifdef __ANDROID__
+    /* C64-EmuDis on Android: an app is not quit from inside, so "quit" leaves
+       the monitor like "exit" and goes back to the C64 screen */
+    mon_exit();
+#else
     exit_mon = exit_mon_quit_vice;
+#endif
 }
 
 void mon_keyboard_feed(const char *string)

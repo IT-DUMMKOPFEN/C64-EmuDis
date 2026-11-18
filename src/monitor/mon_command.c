@@ -108,7 +108,11 @@ static const mon_cmds_t mon_cmd_array[] = {
 
     { "quit", "q",
       NULL,
+#ifdef __ANDROID__
+      "Leave the monitor and return to execution (like exit).",
+#else
       "Exit the emulator immediately.",
+#endif
       NO_FILENAME_ARG
     },
 

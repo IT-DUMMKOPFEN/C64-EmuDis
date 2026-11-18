@@ -1044,6 +1044,9 @@ static const SDLKey keytable_pc_special[] = {
     -1
 };
 
+/* C64-EmuDis: keep the (Android) text input open between lines, see uimon.c */
+int sdl_ui_keep_text_input = 0;
+
 static int pc_vkbd_pos_x, pc_vkbd_pos_y, pc_vkbd_x, pc_vkbd_y;
 
 static void sdl_ui_readline_vkbd_draw(void)
@@ -1159,7 +1162,15 @@ static int sdl_ui_readline_input(SDLKey *key, SDLMod *mod, Uint16 *c_uni)
     *c_uni = 0;
 
 #ifdef USE_SDL2UI
+# ifdef __ANDROID__
+    /* C64-EmuDis: starting text input again shows the Android keyboard
+       again, so only start it when it is off */
+    if (!SDL_IsTextInputActive()) {
+        SDL_StartTextInput();
+    }
+# else
     SDL_StartTextInput();
+# endif
 #endif
 
     do {
@@ -1192,8 +1203,11 @@ static int sdl_ui_readline_input(SDLKey *key, SDLMod *mod, Uint16 *c_uni)
                 if (e.text.text[0] != 0) {
                     *key = e.text.text[0];
                     *c_uni = (Uint16)e.text.text[0];
+#ifndef __ANDROID__
+                    /* (on Android this hides and shows the keyboard) */
                     SDL_StopTextInput();
                     SDL_StartTextInput();
+#endif
                     got_key = 1;
                 }
                 break;
@@ -1249,7 +1263,7 @@ static int sdl_ui_readline_input(SDLKey *key, SDLMod *mod, Uint16 *c_uni)
 
     } while (!got_key);
 
-#ifdef USE_SDL2UI
+#if defined(USE_SDL2UI) && !defined(__ANDROID__)
     SDL_StopTextInput();
 #endif
 
@@ -1857,6 +1871,13 @@ char* sdl_ui_readline(const char* previous, int pos_x, int pos_y)
         lib_free(new_string);
         new_string = NULL;
     }
+#if defined(USE_SDL2UI) && defined(__ANDROID__)
+    /* C64-EmuDis: the Android keyboard stays open while the monitor is open
+       (it reads one line after the other) and closes after other input */
+    if (!sdl_ui_keep_text_input) {
+        SDL_StopTextInput();
+    }
+#endif
     return new_string;
 }
 

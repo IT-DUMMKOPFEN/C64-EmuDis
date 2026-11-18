@@ -209,6 +209,9 @@ void sdl_ui_clear(void);
 void sdl_ui_activate(void);
 ui_menu_retval_t sdl_ui_external_menu_activate(ui_menu_entry_t *item);
 char* sdl_ui_readline(const char* previous, int pos_x, int pos_y);
+
+/* C64-EmuDis: keep the text input (Android keyboard) open between lines */
+extern int sdl_ui_keep_text_input;
 char* sdl_ui_text_input_dialog(const char* title, const char* previous);
 int sdl_ui_slider_input_dialog(const char* title, const int cur, const int min, const int max);
 void sdl_ui_invert_char(int pos_x, int pos_y);
