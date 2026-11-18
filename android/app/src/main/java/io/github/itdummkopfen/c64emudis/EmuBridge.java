@@ -46,6 +46,13 @@ public final class EmuBridge {
 
     public static native boolean nativeMenuActive();
 
+    /** the C64 keyboard overlay was shown or hidden (in the menu and the
+        monitor it then types instead of the Android keyboard) */
+    public static native void nativeOverlay(boolean shown);
+
+    /** trigger a VICE UI action by name, e.g. "monitor-open" */
+    public static native void nativeAction(String name);
+
     /** set an environment variable inside the emulator's C library */
     public static native void nativeSetenv(String name, String value);
 

@@ -18,4 +18,9 @@
  */
 int emudis_sdl_handle_user_event(SDL_Event *e);
 
+/** \brief  Ask for text input (Android: shows the system keyboard unless
+ *          the C64 keyboard overlay is shown)
+ */
+void emudis_sdl_text_input(int on);
+
 #endif

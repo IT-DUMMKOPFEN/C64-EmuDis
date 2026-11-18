@@ -46,7 +46,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/sdl/ui.c`, `src/arch/sdl/Makefile.am` | SDL UI: handle the Android touch control events |
 | `src/arch/shared/archdep_exit.c` | Android: end with `_exit()` (exit() crashed the Android UI threads) |
 | `src/log.c` | log without colours to stdout also when the log file could not be opened (crash) |
-| `src/arch/sdl/uimenu.c/.h`, `src/arch/sdl/uimon.c` | Android: the keyboard stays open while the monitor is open (it was hidden and shown again for every key) |
+| `src/arch/sdl/uimenu.c/.h`, `src/arch/sdl/uimon.c` | Android: the keyboard stays open while the monitor is open (it was hidden and shown again for every key); the C64 keyboard overlay types into the menu and the monitor |
 | `src/monitor/monitor.c`, `mon_command.c` | Android: monitor command `quit` (q) leaves the monitor like `exit` instead of ending the app |
 | `src/arch/shared/archdep_user_*_path.c`, `archdep_default_sysfile_pathlist.c` | own settings/data folder `c64-emudis` (does not touch an installed VICE) |
 | `src/arch/shared/coproc.c` | Windows: quote the whole command for `cmd.exe /C` so paths with spaces work; let the child inherit the pipe handles (ffmpeg was reported as "not found"); keep the process handle so ffmpeg can be terminated; start the child without a console window (it took the keyboard focus while recording) and let it inherit only its pipe handles |

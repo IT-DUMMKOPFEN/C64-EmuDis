@@ -64,6 +64,7 @@
 #include "vsync.h"
 
 #include "uimenu.h"
+#include "emudis_sdl.h"
 
 #ifdef DBGSDLMENU
 #define DBG(x) log_printf x
@@ -1163,11 +1164,9 @@ static int sdl_ui_readline_input(SDLKey *key, SDLMod *mod, Uint16 *c_uni)
 
 #ifdef USE_SDL2UI
 # ifdef __ANDROID__
-    /* C64-EmuDis: starting text input again shows the Android keyboard
-       again, so only start it when it is off */
-    if (!SDL_IsTextInputActive()) {
-        SDL_StartTextInput();
-    }
+    /* C64-EmuDis: starting text input again and again shows the Android
+       keyboard again and again, emudis_sdl_text_input() keeps track */
+    emudis_sdl_text_input(1);
 # else
     SDL_StartTextInput();
 # endif
@@ -1875,7 +1874,7 @@ char* sdl_ui_readline(const char* previous, int pos_x, int pos_y)
     /* C64-EmuDis: the Android keyboard stays open while the monitor is open
        (it reads one line after the other) and closes after other input */
     if (!sdl_ui_keep_text_input) {
-        SDL_StopTextInput();
+        emudis_sdl_text_input(0);
     }
 #endif
     return new_string;

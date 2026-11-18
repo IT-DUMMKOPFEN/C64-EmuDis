@@ -251,15 +251,29 @@ public class EmuActivity extends SDLActivity {
     }
 
     private void toggleKeyboard() {
-        if (keyboard.getVisibility() == View.VISIBLE) {
+        final boolean show = keyboard.getVisibility() != View.VISIBLE;
+        if (show) {
+            keyboard.setVisibility(View.VISIBLE);
+            keysBtn.setActive(true);
+        } else {
             keyboard.releaseAll();
             keyboard.setVisibility(View.GONE);
             keysBtn.setActive(false);
-        } else {
-            keyboard.setVisibility(View.VISIBLE);
-            keysBtn.setActive(true);
         }
+        /* in the menu and the monitor the overlay replaces the Android keyboard */
+        call(() -> EmuBridge.nativeOverlay(show));
         controls.requestLayout();
+    }
+
+    /* "am start ... --es action monitor-open" triggers a VICE action (used by
+       the CI smoke test) */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String action = intent == null ? null : intent.getStringExtra("action");
+        if (action != null && !action.isEmpty()) {
+            call(() -> EmuBridge.nativeAction(action));
+        }
     }
 
     private interface NativeCall {

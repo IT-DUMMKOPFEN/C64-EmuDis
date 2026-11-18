@@ -41,6 +41,7 @@
 #include "ui.h"
 #include "uifonts.h"
 #include "uimenu.h"
+#include "emudis_sdl.h"
 #include "videoarch.h"
 
 static console_t mon_console = {
@@ -68,7 +69,7 @@ void uimon_window_close(void)
     if (using_ui_monitor) {
         sdl_ui_keep_text_input = 0;
 #if defined(USE_SDL2UI) && defined(__ANDROID__)
-        SDL_StopTextInput();    /* hide the Android keyboard */
+        emudis_sdl_text_input(0);   /* hide the Android keyboard */
 #endif
         if (menu_draw) {
             sdl_ui_activate_post_action();

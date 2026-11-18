@@ -56,21 +56,53 @@ read -r W H < <(size)
 adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 3
 # type HI on the C64 keyboard (layout as in EmuActivity/C64KeyboardView)
-python3 - "$W" "$H" > smoke/keys.txt <<'PY'
+# taps <key units x,y ...>: tap keys of the C64 keyboard overlay in portrait
+taps() {
+    python3 - "$W" "$H" "$@" > smoke/keys.txt <<'PY'
 import sys
 w, h = float(sys.argv[1]), float(sys.argv[2])
 bw = w / 6; bar = min(bw * 0.62, h * 0.08); m = bw * 0.05
 top = bar + m + min(w / 1.32, h * 0.45)
 kh = min(h - top, w * 5 / 18 * 1.6); uw = w / 18; uh = kh / 5
-for kx, ky in ((7.5, 2.5), (9.0, 1.5), (15.0, 2.5)):   # H, I, RETURN
+for p in sys.argv[3:]:
+    kx, ky = map(float, p.split(','))
     print(int(kx * uw), int(top + ky * uh))
 PY
-while read -r X Y; do
-    adb shell input tap "$X" "$Y" < /dev/null
-    sleep 1
-done < smoke/keys.txt
+    while read -r X Y; do
+        adb shell input tap "$X" "$Y" < /dev/null
+        sleep 1
+    done < smoke/keys.txt
+}
+ime() {
+    adb shell dumpsys input_method | grep -o "mInputShown=[a-z]*" | head -n 1
+}
+taps 7.5,2.5 9.0,1.5 15.0,2.5      # H, I, RETURN
 sleep 8
 shot portrait-keyboard
+adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
+sleep 1
+
+# monitor: the Android keyboard must open and stay open
+adb shell am start -n $PKG/.EmuActivity --es action monitor-open
+sleep 8
+echo "=== monitor open, Android keyboard: $(ime)"
+shot monitor
+adb shell input text "r"
+adb shell input keyevent 66
+sleep 5
+echo "=== after typing r RETURN, Android keyboard: $(ime)"
+shot monitor-typed
+# C64 keyboard overlay in the monitor: hides the Android keyboard and types
+adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
+sleep 3
+echo "=== C64 keyboard shown, Android keyboard: $(ime)"
+# m SPACE SHIFT+4 ($) 1 0 0 0 RETURN  ->  "m $1000"
+taps 9.0,3.5 8.0,4.5 1.75,3.5 4.5,0.5 1.5,0.5 11.5,0.5 11.5,0.5 11.5,0.5 15.0,2.5
+sleep 4
+shot monitor-c64keys
+taps 4.0,3.5 15.0,2.5                   # X, RETURN: leave the monitor
+sleep 5
+shot after-monitor
 adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 1
 
