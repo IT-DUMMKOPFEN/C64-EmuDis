@@ -148,6 +148,9 @@ int emudis_sdl_handle_user_event(SDL_Event *e)
 
     switch (kind) {
         case EV_KEY:
+            __android_log_print(ANDROID_LOG_DEBUG, "EmuDisKey", "key %d/%d %s%s",
+                                (int)a, (int)(b >> 1), (b & 1) ? "down" : "up",
+                                sdl_menu_state ? " (menu open, ignored)" : "");
             if (!sdl_menu_state) {
                 keyboard_set_keyarr_any((int)a, (int)(b >> 1), (int)(b & 1));
             }

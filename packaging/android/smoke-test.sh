@@ -48,7 +48,7 @@ adb shell settings put system accelerometer_rotation 0
 adb shell settings put system user_rotation 0
 adb shell am start -n $PKG/.EmuActivity
 sleep 25
-adb logcat -d -v brief "VICE:V" "SDL:V" "C64-EmuDis:V" "libc:V" "DEBUG:V" "AndroidRuntime:V" "*:F" | tail -n 250
+adb logcat -d -v brief "VICE:V" "EmuDisKey:V" "SDL:V" "C64-EmuDis:V" "libc:V" "DEBUG:V" "AndroidRuntime:V" "*:F" | tail -n 250
 shot portrait
 
 # KEYS button: top left in portrait (first of six buttons in the top row)
@@ -66,10 +66,10 @@ for kx, ky in ((7.5, 2.5), (9.0, 1.5), (14.0, 2.5)):   # H, I, RETURN
     print(int(kx * uw), int(top + ky * uh))
 PY
 while read -r X Y; do
-    adb shell input tap "$X" "$Y"
+    adb shell input tap "$X" "$Y" < /dev/null
     sleep 1
 done < smoke/keys.txt
-sleep 2
+sleep 8
 shot portrait-keyboard
 adb shell input tap $((W / 12)) $((W / 6 * 62 / 200))
 sleep 1
@@ -80,7 +80,7 @@ shot landscape
 
 adb logcat -d > smoke/logcat.txt
 echo "=== logcat (app, SDL, crashes)"
-grep -E "C64-EmuDis|SDL|VICE|AndroidRuntime|DEBUG|libc|$PKG" smoke/logcat.txt | tail -n 150
+grep -E "EmuDisKey|AndroidRuntime|F DEBUG|F libc" smoke/logcat.txt | tail -n 80
 # SDL shows its errors (e.g. a missing library) in a dialog
 adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
 adb shell cat /sdcard/ui.xml > smoke/ui.xml 2>/dev/null
