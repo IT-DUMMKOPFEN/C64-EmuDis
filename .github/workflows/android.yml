@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   android:
@@ -81,6 +81,13 @@ jobs:
         with:
           name: C64-EmuDis-android
           path: dist/*.apk
+
+      # tagged versions: add the APK to the GitHub release of that tag
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: dist/*.apk
+          prerelease: true
 
       - uses: actions/upload-artifact@v4
         if: failure()
