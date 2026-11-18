@@ -89,6 +89,11 @@ public class EmuActivity extends SDLActivity {
         config.mkdirs();
         //noinspection ResultOfMethodCallIgnored
         media.mkdirs();
+        /* VICE's own folders (settings, log) */
+        //noinspection ResultOfMethodCallIgnored
+        new File(config, "c64-emudis").mkdirs();
+        //noinspection ResultOfMethodCallIgnored
+        new File(home, "c64-emudis").mkdirs();
         String[][] envVars = {
             { "HOME", home.getAbsolutePath() },
             { "XDG_CONFIG_HOME", config.getAbsolutePath() },

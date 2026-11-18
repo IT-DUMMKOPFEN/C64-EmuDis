@@ -743,7 +743,9 @@ static int log_helper(log_t log, unsigned int level, const char *format,
         return -1;
     }
 
-    if ((log_to_file) || (!log_colorize)) {
+    /* C64-EmuDis: always, the stdout output below also needs them when
+       stdout is no terminal (crashed when the log file could not be opened) */
+    {
         nocolorpre = logskipcolors(pretxt);
         nocolortxt = logskipcolors(logtxt);
     }
