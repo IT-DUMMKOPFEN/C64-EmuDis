@@ -1,0 +1,4 @@
+// C64-EmuDis for Android (GPL-2.0-or-later)
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}

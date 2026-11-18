@@ -1,0 +1,8 @@
+.gradle/
+build/
+app/build/
+local.properties
+# created by packaging/android/build-native.sh
+app/src/main/jniLibs/
+app/src/main/assets/
+app/src/main/java/org/libsdl/

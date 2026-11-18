@@ -29,6 +29,7 @@
 #include "archdep_defs.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "archdep_boot_path.h"
 #include "archdep_is_macos_bindist.h"
@@ -62,6 +63,13 @@ char *archdep_get_vice_datadir(void)
         path = util_join_paths(archdep_boot_path(), "..", "share", "vice", NULL);
     } else {
         path = lib_strdup(VICE_DATADIR);
+    }
+#elif defined(__ANDROID__)
+    /* C64-EmuDis: the app unpacks the data into its own storage and tells
+       us where (see android/ in the source tree) */
+    {
+        const char *dir = getenv("EMUDIS_DATADIR");
+        path = lib_strdup(dir != NULL && *dir != 0 ? dir : VICE_DATADIR);
     }
 #else
     /* TODO: Add proper implementation for Haiku using /boot/[system|home]/packages/vice */

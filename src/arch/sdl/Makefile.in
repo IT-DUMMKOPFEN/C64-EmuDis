@@ -150,14 +150,15 @@ am__libarch_a_SOURCES_DIST = actions-cartridge.c actions-cartridge.h \
 	menu_speed.h menu_tape.c menu_tape.h menu_userport.c \
 	menu_userport.h menu_vic20cart.c menu_vic20cart.h \
 	menu_vic20hw.c menu_vic20hw.h menu_video.c menu_video.h \
-	menu_wic64.c menu_wic64.h mousedrv.c mousedrv.h sdlmain.c ui.c \
-	ui.h uifonts.c uifonts.h uifilereq.c uiimagefilereq.c \
-	uifilereq.h uihotkey.c uihotkey.h uimenu.c uimenu.h uimon.c \
-	uimsgbox.c uimsgbox.h uipause.c uipoll.c uipoll.h \
-	uistatusbar.c uistatusbar.h video_sdl1.c video_sdl2.c \
-	videoarch.h vkbd.c vkbd.h vsidui.c vsidui_sdl.h vsyncarch.c \
-	x128_ui.c x64_ui.c x64dtv_ui.c x64sc_ui.c xcbm2_ui.c \
-	xcbm5x0_ui.c xpet_ui.c xplus4_ui.c xscpu64_ui.c xvic_ui.c
+	menu_wic64.c menu_wic64.h mousedrv.c mousedrv.h emudis_sdl.c \
+	emudis_sdl.h sdlmain.c ui.c ui.h uifonts.c uifonts.h \
+	uifilereq.c uiimagefilereq.c uifilereq.h uihotkey.c uihotkey.h \
+	uimenu.c uimenu.h uimon.c uimsgbox.c uimsgbox.h uipause.c \
+	uipoll.c uipoll.h uistatusbar.c uistatusbar.h video_sdl1.c \
+	video_sdl2.c videoarch.h vkbd.c vkbd.h vsidui.c vsidui_sdl.h \
+	vsyncarch.c x128_ui.c x64_ui.c x64dtv_ui.c x64sc_ui.c \
+	xcbm2_ui.c xcbm5x0_ui.c xpet_ui.c xplus4_ui.c xscpu64_ui.c \
+	xvic_ui.c
 @USE_SDL2UI_FALSE@am__objects_1 = video_sdl1.$(OBJEXT)
 @USE_SDL2UI_TRUE@am__objects_1 = video_sdl2.$(OBJEXT)
 am_libarch_a_OBJECTS = actions-cartridge.$(OBJEXT) \
@@ -194,16 +195,16 @@ am_libarch_a_OBJECTS = actions-cartridge.$(OBJEXT) \
 	menu_speed.$(OBJEXT) menu_tape.$(OBJEXT) \
 	menu_userport.$(OBJEXT) menu_vic20cart.$(OBJEXT) \
 	menu_vic20hw.$(OBJEXT) menu_video.$(OBJEXT) \
-	menu_wic64.$(OBJEXT) mousedrv.$(OBJEXT) sdlmain.$(OBJEXT) \
-	ui.$(OBJEXT) uifonts.$(OBJEXT) uifilereq.$(OBJEXT) \
-	uiimagefilereq.$(OBJEXT) uihotkey.$(OBJEXT) uimenu.$(OBJEXT) \
-	uimon.$(OBJEXT) uimsgbox.$(OBJEXT) uipause.$(OBJEXT) \
-	uipoll.$(OBJEXT) uistatusbar.$(OBJEXT) $(am__objects_1) \
-	vkbd.$(OBJEXT) vsidui.$(OBJEXT) vsyncarch.$(OBJEXT) \
-	x128_ui.$(OBJEXT) x64_ui.$(OBJEXT) x64dtv_ui.$(OBJEXT) \
-	x64sc_ui.$(OBJEXT) xcbm2_ui.$(OBJEXT) xcbm5x0_ui.$(OBJEXT) \
-	xpet_ui.$(OBJEXT) xplus4_ui.$(OBJEXT) xscpu64_ui.$(OBJEXT) \
-	xvic_ui.$(OBJEXT)
+	menu_wic64.$(OBJEXT) mousedrv.$(OBJEXT) emudis_sdl.$(OBJEXT) \
+	sdlmain.$(OBJEXT) ui.$(OBJEXT) uifonts.$(OBJEXT) \
+	uifilereq.$(OBJEXT) uiimagefilereq.$(OBJEXT) \
+	uihotkey.$(OBJEXT) uimenu.$(OBJEXT) uimon.$(OBJEXT) \
+	uimsgbox.$(OBJEXT) uipause.$(OBJEXT) uipoll.$(OBJEXT) \
+	uistatusbar.$(OBJEXT) $(am__objects_1) vkbd.$(OBJEXT) \
+	vsidui.$(OBJEXT) vsyncarch.$(OBJEXT) x128_ui.$(OBJEXT) \
+	x64_ui.$(OBJEXT) x64dtv_ui.$(OBJEXT) x64sc_ui.$(OBJEXT) \
+	xcbm2_ui.$(OBJEXT) xcbm5x0_ui.$(OBJEXT) xpet_ui.$(OBJEXT) \
+	xplus4_ui.$(OBJEXT) xscpu64_ui.$(OBJEXT) xvic_ui.$(OBJEXT)
 libarch_a_OBJECTS = $(am_libarch_a_OBJECTS)
 libtoolarch_a_AR = $(AR) $(ARFLAGS)
 libtoolarch_a_LIBADD =
@@ -232,10 +233,10 @@ am__depfiles_remade = ./$(DEPDIR)/actions-cartridge.Po \
 	./$(DEPDIR)/actions-media.Po ./$(DEPDIR)/actions-settings.Po \
 	./$(DEPDIR)/actions-snapshot.Po ./$(DEPDIR)/actions-speed.Po \
 	./$(DEPDIR)/actions-tape.Po ./$(DEPDIR)/actions-vsid.Po \
-	./$(DEPDIR)/archdep.Po ./$(DEPDIR)/fullscreen.Po \
-	./$(DEPDIR)/hotkeys.Po ./$(DEPDIR)/icon.Po ./$(DEPDIR)/joy.Po \
-	./$(DEPDIR)/kbd.Po ./$(DEPDIR)/lightpendrv.Po \
-	./$(DEPDIR)/menu_c128hw.Po \
+	./$(DEPDIR)/archdep.Po ./$(DEPDIR)/emudis_sdl.Po \
+	./$(DEPDIR)/fullscreen.Po ./$(DEPDIR)/hotkeys.Po \
+	./$(DEPDIR)/icon.Po ./$(DEPDIR)/joy.Po ./$(DEPDIR)/kbd.Po \
+	./$(DEPDIR)/lightpendrv.Po ./$(DEPDIR)/menu_c128hw.Po \
 	./$(DEPDIR)/menu_c64_common_expansions.Po \
 	./$(DEPDIR)/menu_c64_expansions.Po ./$(DEPDIR)/menu_c64cart.Po \
 	./$(DEPDIR)/menu_c64dtvhw.Po ./$(DEPDIR)/menu_c64hw.Po \
@@ -745,6 +746,8 @@ libarch_a_SOURCES = \
 	menu_wic64.h \
 	mousedrv.c \
 	mousedrv.h \
+	emudis_sdl.c \
+	emudis_sdl.h \
 	sdlmain.c \
 	ui.c \
 	ui.h \
@@ -865,6 +868,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/actions-tape.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/actions-vsid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/archdep.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emudis_sdl.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fullscreen.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hotkeys.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icon.Po@am__quote@ # am--include-marker
@@ -1110,6 +1114,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/actions-tape.Po
 	-rm -f ./$(DEPDIR)/actions-vsid.Po
 	-rm -f ./$(DEPDIR)/archdep.Po
+	-rm -f ./$(DEPDIR)/emudis_sdl.Po
 	-rm -f ./$(DEPDIR)/fullscreen.Po
 	-rm -f ./$(DEPDIR)/hotkeys.Po
 	-rm -f ./$(DEPDIR)/icon.Po
@@ -1256,6 +1261,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/actions-tape.Po
 	-rm -f ./$(DEPDIR)/actions-vsid.Po
 	-rm -f ./$(DEPDIR)/archdep.Po
+	-rm -f ./$(DEPDIR)/emudis_sdl.Po
 	-rm -f ./$(DEPDIR)/fullscreen.Po
 	-rm -f ./$(DEPDIR)/hotkeys.Po
 	-rm -f ./$(DEPDIR)/icon.Po

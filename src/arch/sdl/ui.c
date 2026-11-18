@@ -64,6 +64,7 @@
 #include "uistatusbar.h"
 #include "videoarch.h"
 #include "vkbd.h"
+#include "emudis_sdl.h"
 #include "vsidui_sdl.h"
 #include "vsync.h"
 
@@ -132,6 +133,12 @@ void ui_handle_misc_sdl_event(SDL_Event e)
 #ifdef SDL_DEBUG
     int wh, ww;
 #endif
+#endif
+    /* C64-EmuDis: Android touch controls */
+    if (emudis_sdl_handle_user_event(&e)) {
+        return;
+    }
+#ifdef USE_SDL2UI
     if (e.type == SDL_WINDOWEVENT) {
         SDL_Window* window = SDL_GetWindowFromID(e.window.windowID);
         video_canvas_t* canvas = (video_canvas_t*)(SDL_GetWindowData(window, VIDEO_SDL2_CANVAS_INDEX_KEY));

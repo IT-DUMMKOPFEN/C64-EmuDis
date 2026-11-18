@@ -1,0 +1,68 @@
+// C64-EmuDis for Android (GPL-2.0-or-later)
+//
+// The native libraries (libmain.so = VICE x64sc, libSDL2.so), the SDL Java
+// glue (org.libsdl.app) and the VICE data in assets/vice/ are created by
+// packaging/android/build-native.sh before this build runs.
+
+plugins {
+    id 'com.android.application'
+}
+
+// one version for all systems: src/emudis_version.h
+def versionHeader = file('../../src/emudis_version.h').text
+def emudisVersion = (versionHeader =~ /#define\s+EMUDIS_VERSION\s+"([^"]+)"/)[0][1]
+def buildNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int
+
+// release signing key from the environment (CI secrets), else the debug key
+def ksFile = System.getenv('EMUDIS_KEYSTORE')
+def haveKey = ksFile != null && file(ksFile).exists()
+
+android {
+    namespace 'io.github.itdummkopfen.c64emudis'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'io.github.itdummkopfen.c64emudis'
+        minSdk 24
+        targetSdk 35
+        versionCode buildNumber
+        versionName emudisVersion
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+    }
+
+    signingConfigs {
+        if (haveKey) {
+            release {
+                storeFile file(ksFile)
+                storePassword System.getenv('EMUDIS_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('EMUDIS_KEY_ALIAS')
+                keyPassword System.getenv('EMUDIS_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig haveKey ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}

@@ -210,6 +210,8 @@ libarch_a_SOURCES = \
 	menu_wic64.h \
 	mousedrv.c \
 	mousedrv.h \
+	emudis_sdl.c \
+	emudis_sdl.h \
 	sdlmain.c \
 	ui.c \
 	ui.h \
