@@ -116,10 +116,13 @@ cp "$VB/src/x64sc" "$APP/jniLibs/$ABI/libmain.so"
 cp "$PFX/lib/libSDL2.so" "$APP/jniLibs/$ABI/libSDL2.so"
 "$STRIP" --strip-unneeded "$APP/jniLibs/$ABI/libmain.so" "$APP/jniLibs/$ABI/libSDL2.so"
 
-# libc++_shared.so if SDL was linked against it
-if "$TC/bin/llvm-readelf" -d "$APP/jniLibs/$ABI/libSDL2.so" | grep -q "libc++_shared"; then
-    cp "$TC/sysroot/usr/lib/$TRIPLE/libc++_shared.so" "$APP/jniLibs/$ABI/"
-fi
+# libc++_shared.so: VICE (reSID is C++) and maybe SDL need it
+for lib in libmain.so libSDL2.so; do
+    if "$TC/bin/llvm-readelf" -d "$APP/jniLibs/$ABI/$lib" | grep -q "libc++_shared"; then
+        cp "$TC/sysroot/usr/lib/$TRIPLE/libc++_shared.so" "$APP/jniLibs/$ABI/"
+    fi
+done
+"$TC/bin/llvm-readelf" -d "$APP/jniLibs/$ABI/libmain.so" | grep NEEDED
 
 rm -rf "$APP/java/org/libsdl"
 mkdir -p "$APP/java/org/libsdl"

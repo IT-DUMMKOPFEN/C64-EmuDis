@@ -62,6 +62,14 @@ shot landscape
 adb logcat -d > smoke/logcat.txt
 echo "=== logcat (app, SDL, crashes)"
 grep -E "C64-EmuDis|SDL|VICE|AndroidRuntime|DEBUG|libc|$PKG" smoke/logcat.txt | tail -n 150
+# SDL shows its errors (e.g. a missing library) in a dialog
+adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+adb shell cat /sdcard/ui.xml > smoke/ui.xml 2>/dev/null
+if grep -q "SDL Error" smoke/ui.xml; then
+    echo "=== SDL ERROR DIALOG:"
+    grep -o 'text="[^"]*"' smoke/ui.xml
+    exit 1
+fi
 if adb shell pidof $PKG > /dev/null; then
     echo "=== app is running"
 else
