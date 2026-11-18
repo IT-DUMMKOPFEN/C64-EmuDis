@@ -11,6 +11,7 @@
 # This file is part of C64-EmuDis (GPL-2.0-or-later).
 
 set -o nounset
+set -x
 
 APK="$1"
 PKG=io.github.itdummkopfen.c64emudis
@@ -28,9 +29,11 @@ except Exception as e:
     print("no resize:", e)
 PY
     echo "=== SCREENSHOT $1 BEGIN"
-    base64 -w 0 "smoke/$1.png"
-    echo
+    ls -la "smoke/$1.png"
+    { set +x; } 2>/dev/null
+    base64 -w 2000 "smoke/$1.png"
     echo "=== SCREENSHOT $1 END"
+    set -x
 }
 
 size() {
@@ -45,6 +48,7 @@ adb shell settings put system accelerometer_rotation 0
 adb shell settings put system user_rotation 0
 adb shell am start -n $PKG/.EmuActivity
 sleep 25
+adb logcat -d | grep -E "C64-EmuDis|SDL|AndroidRuntime|DEBUG|$PKG" | tail -n 60
 shot portrait
 
 # KEYS button: top left in portrait (first of six buttons in the top row)
