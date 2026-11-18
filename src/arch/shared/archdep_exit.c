@@ -29,6 +29,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __ANDROID__
+#include <unistd.h>
+#endif
 #include <stdbool.h>
 
 #if !defined(USE_HEADLESSUI) && !defined(USE_SDL2UI) && !defined(USE_SDLUI)
@@ -113,7 +116,14 @@ static void actually_exit(int exit_code)
     archdep_thread_shutdown();
 #endif
 
+#ifdef __ANDROID__
+    /* C64-EmuDis: exit() runs the C++ destructors of the Android UI
+       libraries while their threads still run, which crashes the app */
+    fflush(NULL);
+    _exit(exit_code);
+#else
     exit(exit_code);
+#endif
 }
 
 #ifdef USE_GTK3UI

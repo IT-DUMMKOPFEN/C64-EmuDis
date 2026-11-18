@@ -46,6 +46,9 @@ public final class EmuBridge {
 
     public static native boolean nativeMenuActive();
 
+    /** set an environment variable inside the emulator's C library */
+    public static native void nativeSetenv(String name, String value);
+
     /* --- joystick state shared by the stick and the fire buttons --------- */
 
     private static int joyPort = 1;     /* 0 = port 1, 1 = port 2 */

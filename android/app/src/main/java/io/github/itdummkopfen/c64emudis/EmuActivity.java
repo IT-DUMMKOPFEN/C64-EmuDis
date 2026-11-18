@@ -89,19 +89,35 @@ public class EmuActivity extends SDLActivity {
         config.mkdirs();
         //noinspection ResultOfMethodCallIgnored
         media.mkdirs();
-        try {
-            Os.setenv("HOME", home.getAbsolutePath(), true);
-            Os.setenv("XDG_CONFIG_HOME", config.getAbsolutePath(), true);
-            Os.setenv("XDG_DATA_HOME", home.getAbsolutePath(), true);
-            Os.setenv("XDG_CACHE_HOME", getCacheDir().getAbsolutePath(), true);
-            Os.setenv("EMUDIS_DATADIR", data.getAbsolutePath(), true);
-        } catch (Exception e) {
-            Log.e(TAG, "setenv failed", e);
+        String[][] envVars = {
+            { "HOME", home.getAbsolutePath() },
+            { "XDG_CONFIG_HOME", config.getAbsolutePath() },
+            { "XDG_DATA_HOME", home.getAbsolutePath() },
+            { "XDG_CACHE_HOME", getCacheDir().getAbsolutePath() },
+            { "XDG_STATE_HOME", home.getAbsolutePath() },
+            { "EMUDIS_DATADIR", data.getAbsolutePath() },
+        };
+        for (String[] v : envVars) {
+            try {
+                Os.setenv(v[0], v[1], true);
+            } catch (Exception e) {
+                Log.e(TAG, "setenv failed", e);
+            }
         }
 
         super.onCreate(savedInstanceState);
         if (mBrokenLibraries || mLayout == null) {
             return;
+        }
+
+        /* the libraries are loaded now; the emulator starts later (when the
+           surface exists), so this reaches it in time */
+        for (String[] v : envVars) {
+            try {
+                EmuBridge.nativeSetenv(v[0], v[1]);
+            } catch (UnsatisfiedLinkError e) {
+                Log.e(TAG, "nativeSetenv failed", e);
+            }
         }
 
         Window w = getWindow();

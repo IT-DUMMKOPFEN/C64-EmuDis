@@ -308,6 +308,25 @@ JNIEXPORT void JNICALL JNI_FN(nativeBack)(JNIEnv *env, jclass cls)
     push_event(EV_BACK, 0, 0);
 }
 
+/* set an environment variable for the emulator; Os.setenv in Java does not
+   reach the emulator when it runs under ARM translation (emulators,
+   Chromebooks), which has its own C library */
+JNIEXPORT void JNICALL JNI_FN(nativeSetenv)(JNIEnv *env, jclass cls, jstring jname, jstring jval)
+{
+    const char *name = (*env)->GetStringUTFChars(env, jname, NULL);
+    const char *value = (*env)->GetStringUTFChars(env, jval, NULL);
+
+    if (name != NULL && value != NULL) {
+        setenv(name, value, 1);
+    }
+    if (name != NULL) {
+        (*env)->ReleaseStringUTFChars(env, jname, name);
+    }
+    if (value != NULL) {
+        (*env)->ReleaseStringUTFChars(env, jval, value);
+    }
+}
+
 JNIEXPORT jboolean JNICALL JNI_FN(nativeMenuActive)(JNIEnv *env, jclass cls)
 {
     return sdl_menu_state ? JNI_TRUE : JNI_FALSE;
