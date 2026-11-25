@@ -112,10 +112,10 @@ libc64_a_AR = $(AR) $(ARFLAGS)
 libc64_a_LIBADD =
 am_libc64_a_OBJECTS = c64-cmdline-options.$(OBJEXT) \
 	c64-memory-hacks.$(OBJEXT) c64-resources.$(OBJEXT) \
-	c64-snapshot.$(OBJEXT) c64.$(OBJEXT) c64_256k.$(OBJEXT) \
-	c64bus.$(OBJEXT) c64cia1.$(OBJEXT) c64cia2.$(OBJEXT) \
-	c64cpu.$(OBJEXT) c64datasette.$(OBJEXT) c64drive.$(OBJEXT) \
-	c64export.$(OBJEXT) c64fastiec.$(OBJEXT) \
+	c64-snapshot.$(OBJEXT) c64.$(OBJEXT) c64turbo.$(OBJEXT) \
+	c64_256k.$(OBJEXT) c64bus.$(OBJEXT) c64cia1.$(OBJEXT) \
+	c64cia2.$(OBJEXT) c64cpu.$(OBJEXT) c64datasette.$(OBJEXT) \
+	c64drive.$(OBJEXT) c64export.$(OBJEXT) c64fastiec.$(OBJEXT) \
 	c64gluelogic.$(OBJEXT) c64iec.$(OBJEXT) c64io.$(OBJEXT) \
 	c64keyboard.$(OBJEXT) c64mem.$(OBJEXT) c64meminit.$(OBJEXT) \
 	c64memlimit.$(OBJEXT) c64memrom.$(OBJEXT) \
@@ -128,7 +128,7 @@ libc64_a_OBJECTS = $(am_libc64_a_OBJECTS)
 libc64c128_a_AR = $(AR) $(ARFLAGS)
 libc64c128_a_LIBADD =
 am_libc64c128_a_OBJECTS = c64bus.$(OBJEXT) c64cia2.$(OBJEXT) \
-	c64datasette.$(OBJEXT) c64export.$(OBJEXT) \
+	c64turbo.$(OBJEXT) c64datasette.$(OBJEXT) c64export.$(OBJEXT) \
 	c64gluelogic.$(OBJEXT) c64iec.$(OBJEXT) c64io.$(OBJEXT) \
 	c64keyboard.$(OBJEXT) c64meminit.$(OBJEXT) \
 	c64memlimit.$(OBJEXT) c64memrom.$(OBJEXT) c64printer.$(OBJEXT) \
@@ -145,10 +145,10 @@ libc64sc_a_AR = $(AR) $(ARFLAGS)
 libc64sc_a_LIBADD =
 am_libc64sc_a_OBJECTS = c64-cmdline-options.$(OBJEXT) \
 	c64-memory-hacks.$(OBJEXT) c64-resources.$(OBJEXT) \
-	c64-snapshot.$(OBJEXT) c64.$(OBJEXT) c64_256k.$(OBJEXT) \
-	c64bus.$(OBJEXT) c64cia1.$(OBJEXT) c64cia2.$(OBJEXT) \
-	c64cpusc.$(OBJEXT) c64datasette.$(OBJEXT) c64drive.$(OBJEXT) \
-	c64export.$(OBJEXT) c64fastiec.$(OBJEXT) \
+	c64-snapshot.$(OBJEXT) c64.$(OBJEXT) c64turbo.$(OBJEXT) \
+	c64_256k.$(OBJEXT) c64bus.$(OBJEXT) c64cia1.$(OBJEXT) \
+	c64cia2.$(OBJEXT) c64cpusc.$(OBJEXT) c64datasette.$(OBJEXT) \
+	c64drive.$(OBJEXT) c64export.$(OBJEXT) c64fastiec.$(OBJEXT) \
 	c64gluelogic.$(OBJEXT) c64iec.$(OBJEXT) c64io.$(OBJEXT) \
 	c64keyboard.$(OBJEXT) c64memsc.$(OBJEXT) c64meminit.$(OBJEXT) \
 	c64memlimit.$(OBJEXT) c64memrom.$(OBJEXT) \
@@ -161,11 +161,12 @@ libc64sc_a_OBJECTS = $(am_libc64sc_a_OBJECTS)
 libc64scpu64_a_AR = $(AR) $(ARFLAGS)
 libc64scpu64_a_LIBADD =
 am_libc64scpu64_a_OBJECTS = c64bus.$(OBJEXT) c64cia1.$(OBJEXT) \
-	c64cia2.$(OBJEXT) c64datasette.$(OBJEXT) c64drive.$(OBJEXT) \
-	c64export.$(OBJEXT) c64fastiec.$(OBJEXT) c64iec.$(OBJEXT) \
-	c64io.$(OBJEXT) c64keyboard.$(OBJEXT) c64memsnapshot.$(OBJEXT) \
-	c64parallel.$(OBJEXT) c64printer.$(OBJEXT) c64romset.$(OBJEXT) \
-	c64rsuser.$(OBJEXT) c64sound.$(OBJEXT) c64video.$(OBJEXT)
+	c64cia2.$(OBJEXT) c64turbo.$(OBJEXT) c64datasette.$(OBJEXT) \
+	c64drive.$(OBJEXT) c64export.$(OBJEXT) c64fastiec.$(OBJEXT) \
+	c64iec.$(OBJEXT) c64io.$(OBJEXT) c64keyboard.$(OBJEXT) \
+	c64memsnapshot.$(OBJEXT) c64parallel.$(OBJEXT) \
+	c64printer.$(OBJEXT) c64romset.$(OBJEXT) c64rsuser.$(OBJEXT) \
+	c64sound.$(OBJEXT) c64video.$(OBJEXT)
 libc64scpu64_a_OBJECTS = $(am_libc64scpu64_a_OBJECTS)
 libc64scstubs_a_AR = $(AR) $(ARFLAGS)
 libc64scstubs_a_LIBADD =
@@ -225,10 +226,10 @@ am__depfiles_remade = ./$(DEPDIR)/c64-cmdline-options.Po \
 	./$(DEPDIR)/c64printer.Po ./$(DEPDIR)/c64rom.Po \
 	./$(DEPDIR)/c64romset.Po ./$(DEPDIR)/c64rsuser.Po \
 	./$(DEPDIR)/c64sc-stubs.Po ./$(DEPDIR)/c64scmodel.Po \
-	./$(DEPDIR)/c64sound.Po ./$(DEPDIR)/c64video.Po \
-	./$(DEPDIR)/plus256k.Po ./$(DEPDIR)/plus60k.Po \
-	./$(DEPDIR)/psid.Po ./$(DEPDIR)/reloc65.Po \
-	./$(DEPDIR)/vsid-cmdline-options.Po \
+	./$(DEPDIR)/c64sound.Po ./$(DEPDIR)/c64turbo.Po \
+	./$(DEPDIR)/c64video.Po ./$(DEPDIR)/plus256k.Po \
+	./$(DEPDIR)/plus60k.Po ./$(DEPDIR)/psid.Po \
+	./$(DEPDIR)/reloc65.Po ./$(DEPDIR)/vsid-cmdline-options.Po \
 	./$(DEPDIR)/vsid-debugcart.Po ./$(DEPDIR)/vsid-resources.Po \
 	./$(DEPDIR)/vsid-snapshot.Po ./$(DEPDIR)/vsid-stubs.Po \
 	./$(DEPDIR)/vsid.Po ./$(DEPDIR)/vsidcia1.Po \
@@ -651,6 +652,8 @@ libc64_a_SOURCES = \
 	c64-snapshot.h \
 	c64.c \
 	c64.h \
+	c64turbo.c \
+	c64turbo.h \
 	c64_256k.c \
 	c64_256k.h \
 	c64bus.c \
@@ -714,6 +717,8 @@ libc64sc_a_SOURCES = \
 	c64-snapshot.h \
 	c64.c \
 	c64.h \
+	c64turbo.c \
+	c64turbo.h \
 	c64_256k.c \
 	c64_256k.h \
 	c64bus.c \
@@ -782,6 +787,8 @@ libc64c128_a_SOURCES = \
 	c64cart.h \
 	c64cia.h \
 	c64cia2.c \
+	c64turbo.c \
+	c64turbo.h \
 	c64datasette.c \
 	c64export.c \
 	c64gluelogic.c \
@@ -812,6 +819,8 @@ libc64scpu64_a_SOURCES = \
 	c64cia.h \
 	c64cia1.c \
 	c64cia2.c \
+	c64turbo.c \
+	c64turbo.h \
 	c64datasette.c \
 	c64drive.c \
 	c64export.c \
@@ -962,6 +971,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c64sc-stubs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c64scmodel.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c64sound.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c64turbo.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/c64video.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plus256k.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plus60k.Po@am__quote@ # am--include-marker
@@ -1238,6 +1248,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/c64sc-stubs.Po
 	-rm -f ./$(DEPDIR)/c64scmodel.Po
 	-rm -f ./$(DEPDIR)/c64sound.Po
+	-rm -f ./$(DEPDIR)/c64turbo.Po
 	-rm -f ./$(DEPDIR)/c64video.Po
 	-rm -f ./$(DEPDIR)/plus256k.Po
 	-rm -f ./$(DEPDIR)/plus60k.Po
@@ -1338,6 +1349,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/c64sc-stubs.Po
 	-rm -f ./$(DEPDIR)/c64scmodel.Po
 	-rm -f ./$(DEPDIR)/c64sound.Po
+	-rm -f ./$(DEPDIR)/c64turbo.Po
 	-rm -f ./$(DEPDIR)/c64video.Po
 	-rm -f ./$(DEPDIR)/plus256k.Po
 	-rm -f ./$(DEPDIR)/plus60k.Po

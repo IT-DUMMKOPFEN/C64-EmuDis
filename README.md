@@ -21,6 +21,7 @@ Author: **IT-Dummkopfen** · License: **GPL-2.0-or-later** (see [Why GPL?](#lice
 | Tool | What it does |
 |------|--------------|
 | **No loading times** | Automatic warp while a disk drive or the datasette is loading, full 1541 emulation (fast loaders work), PRGs injected into RAM. Toggle: *Tools → Warp while loading* |
+| **CPU turbo** | The C64 CPU at 2 - 77 MHz like the Ultimate 64 turbo modes; picture, sound and timers keep their speed, normal speed while loading. *Tools → C64 CPU turbo*, on/off with Alt+Shift+U |
 | **Live Memory Viewer** | Hex + PETSCII/screen code/ASCII view or 256×256 memory map, updated up to 50×/s while the C64 runs, change highlighting, editing, search, save/load ranges, VIC-II info |
 | **Full Memory View** | All 64KB as 16 named $1000 blocks with live change heat map, C64 speed 1-100 %, pause/next frame, zoom with list of changed addresses, trainer search (narrow down, write, freeze, POKE) |
 | **Font Finder** | Finds character sets in RAM (scored heuristics), hires/multicolor preview, export .bin/.prg/.png, activate in VIC |

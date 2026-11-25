@@ -90,6 +90,105 @@ static UI_MENU_CALLBACK(Machine_dynmenu_callback)
     return MENU_SUBMENU_STRING;
 }
 
+/* C64-EmuDis: CPU turbo (c64/c64turbo.c), like the Ultimate 64 turbo modes */
+UI_MENU_DEFINE_RADIO(EmuDisTurbo)
+UI_MENU_DEFINE_TOGGLE(EmuDisTurboLoadPause)
+
+static const ui_menu_entry_t emudis_turbo_menu[] = {
+    SDL_MENU_ITEM_TITLE("C64 CPU speed"),
+    {   .string   = "Normal (1 MHz)",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)1
+    },
+    {   .string   = "2 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)2
+    },
+    {   .string   = "3 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)3
+    },
+    {   .string   = "4 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)4
+    },
+    {   .string   = "5 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)5
+    },
+    {   .string   = "6 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)6
+    },
+    {   .string   = "8 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)8
+    },
+    {   .string   = "10 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)10
+    },
+    {   .string   = "12 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)12
+    },
+    {   .string   = "14 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)14
+    },
+    {   .string   = "20 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)20
+    },
+    {   .string   = "24 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)24
+    },
+    {   .string   = "32 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)32
+    },
+    {   .string   = "40 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)40
+    },
+    {   .string   = "48 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)48
+    },
+    {   .string   = "65 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)65
+    },
+    {   .string   = "77 MHz",
+        .type     = MENU_ENTRY_RESOURCE_RADIO,
+        .callback = radio_EmuDisTurbo_callback,
+        .data     = (ui_callback_data_t)77
+    },
+    SDL_MENU_ITEM_SEPARATOR,
+    {   .string   = "Normal speed while loading",
+        .type     = MENU_ENTRY_RESOURCE_TOGGLE,
+        .callback = toggle_EmuDisTurboLoadPause_callback
+    },
+    SDL_MENU_LIST_END
+};
+
 static ui_menu_entry_t x64sc_main_menu[] = {
     {   .action    = ACTION_SMART_ATTACH,
         .string    = "Autostart image",
@@ -151,6 +250,11 @@ static ui_menu_entry_t x64sc_main_menu[] = {
         .type     = MENU_ENTRY_SUBMENU,
         .callback = submenu_callback,
         .data     = (ui_callback_data_t)speed_menu
+    },
+    {   .string   = "CPU turbo (C64-EmuDis)",
+        .type     = MENU_ENTRY_SUBMENU,
+        .callback = submenu_radio_callback,
+        .data     = (ui_callback_data_t)emudis_turbo_menu
     },
     {   .string   = "Reset",
         .type     = MENU_ENTRY_SUBMENU,

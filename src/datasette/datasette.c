@@ -374,6 +374,21 @@ static void datasette_update_ui_counter(int port)
 }
 
 
+/* C64-EmuDis: is a tape playing right now (play pressed and the motor on)?
+   Used to pause the CPU turbo while a tape loads. */
+int datasette_emudis_is_playing(void)
+{
+    int port;
+
+    for (port = 0; port < TAPEPORT_MAX_PORTS; port++) {
+        if (current_image[port] != NULL && datasette_motor[port]
+                && current_image[port]->mode == DATASETTE_CONTROL_START) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void datasette_reset_counter(int port)
 {
     if (current_image[port] == NULL) {

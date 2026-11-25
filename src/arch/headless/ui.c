@@ -42,6 +42,8 @@
 #include <CoreFoundation/CFString.h>
 #endif
 
+#include "emudis_hooks.h"
+#include "gfxoutputdrv/ffmpegexedrv.h"
 #include "debug_headless.h"
 #include "archdep.h"
 
@@ -407,3 +409,7 @@ video_canvas_t *ui_get_active_canvas(void)
 {
     return NULL;
 }
+
+/* C64-EmuDis hooks (the GTK3 and SDL UIs define them in their own files) */
+int emudis_sprite_overlay = 0;
+void (*emudis_ffmpeg_sync_info)(double *video_seconds, double *audio_seconds) = NULL;

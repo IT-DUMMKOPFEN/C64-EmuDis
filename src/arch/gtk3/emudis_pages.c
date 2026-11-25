@@ -108,6 +108,19 @@ static const char *help_text =
        "candidates (green) are left. Select one, enter a value and <i>Freeze</i> it (e.g. infinite lives); "
        "the matching POKE is shown. Values are decimal; use $ for hex.")
 
+    H2("C64 CPU turbo")
+    P("<i>Tools → C64 CPU turbo</i> makes the C64 CPU faster, like the turbo modes of the "
+      "Ultimate 64: 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40, 48, 65 or 77 MHz instead of the "
+      "normal 1 MHz. " KBD("Alt+Shift+U") " switches the turbo on and off (the last speed is kept).")
+    LI("Only the CPU gets faster: the picture, the music and the timers keep their normal speed, "
+       "so programs simply calculate faster (BASIC, packers, 3D and vector demos, slow games).")
+    LI("Loaders count CPU cycles, so the turbo pauses automatically while the C64 talks to a disk "
+       "drive or a tape plays and comes back half a second later (<i>Normal speed while loading</i>).")
+    LI("Games and demos that rely on exact CPU timing (raster effects, music players called from "
+       "loops) can run too fast or look wrong; switch back to <i>Normal C64 speed</i> for them.")
+    LI("High speeds need a fast computer: if the emulator cannot keep up, everything slows down "
+       "instead (the speed display shows less than 100%).")
+
     H2("Sprites on screen")
     P("<i>Tools → Sprites on screen</i> (" KBD("Alt+Shift+E") ") draws a red frame with the sprite "
       "number around every sprite on the emulated screen, live while the C64 runs.")

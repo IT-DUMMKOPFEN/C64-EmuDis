@@ -25,6 +25,7 @@
 
 #include "hotkeys.h"
 #include "lib.h"
+#include "machine.h"
 #include "mainlock.h"
 #include "resources.h"
 #include "screenshot.h"
@@ -177,6 +178,113 @@ static void sprite_overlay_action(ui_action_map_t *self)
                           : "Sprites on screen: OFF", true);
 }
 
+/* --- CPU turbo (c64/c64turbo.c) ------------------------------------------ */
+
+static const int turbo_speeds[] = { 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40, 48, 65, 77 };
+static const int turbo_actions[] = {
+    ACTION_EMUDIS_TURBO_1,
+    ACTION_EMUDIS_TURBO_2,
+    ACTION_EMUDIS_TURBO_3,
+    ACTION_EMUDIS_TURBO_4,
+    ACTION_EMUDIS_TURBO_5,
+    ACTION_EMUDIS_TURBO_6,
+    ACTION_EMUDIS_TURBO_8,
+    ACTION_EMUDIS_TURBO_10,
+    ACTION_EMUDIS_TURBO_12,
+    ACTION_EMUDIS_TURBO_14,
+    ACTION_EMUDIS_TURBO_20,
+    ACTION_EMUDIS_TURBO_24,
+    ACTION_EMUDIS_TURBO_32,
+    ACTION_EMUDIS_TURBO_40,
+    ACTION_EMUDIS_TURBO_48,
+    ACTION_EMUDIS_TURBO_65,
+    ACTION_EMUDIS_TURBO_77,
+};
+static int turbo_last = 8;      /* turbo speed for "turbo on/off" */
+
+static int lock_get_int(const char *name)
+{
+    int v = 0;
+    bool need = (mainlock_get_depth() == 0);
+
+    if (need) {
+        mainlock_obtain();
+    }
+    resources_get_int(name, &v);
+    if (need) {
+        mainlock_release();
+    }
+    return v;
+}
+
+static void lock_set_int(const char *name, int v)
+{
+    bool need = (mainlock_get_depth() == 0);
+
+    if (need) {
+        mainlock_obtain();
+    }
+    resources_set_int(name, v);
+    if (need) {
+        mainlock_release();
+    }
+}
+
+/* menu state: the radio item of the current speed, the "while loading" check */
+static void turbo_update_menu(void)
+{
+    int speed = lock_get_int("EmuDisTurbo");
+    size_t i;
+
+    for (i = 0; i < sizeof turbo_speeds / sizeof turbo_speeds[0]; i++) {
+        if (turbo_speeds[i] == speed) {
+            vhk_gtk_set_check_item_blocked_by_action(turbo_actions[i], TRUE);
+        }
+    }
+    vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_TURBO_LOAD_PAUSE_TOGGLE,
+            (gboolean)(lock_get_int("EmuDisTurboLoadPause") != 0));
+}
+
+static void turbo_set(int speed)
+{
+    char *msg;
+
+    if (speed > 1) {
+        turbo_last = speed;
+    }
+    lock_set_int("EmuDisTurbo", speed);
+    turbo_update_menu();
+    if (speed > 1) {
+        msg = lib_msprintf("CPU turbo: %d MHz (%dx normal speed)", speed, speed);
+    } else {
+        msg = lib_strdup("CPU turbo off: normal C64 speed (1 MHz)");
+    }
+    ui_display_statustext(msg, true);
+    lib_free(msg);
+}
+
+static void turbo_action(ui_action_map_t *self)
+{
+    turbo_set(vice_ptr_to_int(self->data));
+}
+
+static void turbo_toggle_action(ui_action_map_t *self)
+{
+    int speed = lock_get_int("EmuDisTurbo");
+
+    turbo_set(speed > 1 ? 1 : turbo_last);
+}
+
+static void turbo_load_pause_action(ui_action_map_t *self)
+{
+    int on = !lock_get_int("EmuDisTurboLoadPause");
+
+    lock_set_int("EmuDisTurboLoadPause", on);
+    turbo_update_menu();
+    ui_display_statustext(on ? "CPU turbo: normal speed while loading (recommended)"
+                             : "CPU turbo: stays on while loading (fast loaders may fail)", true);
+}
+
 static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_MEMVIEW,         .handler = memview_action,      .uithread = true },
     { .action = ACTION_EMUDIS_FULLMEM,         .handler = fullmem_action,      .uithread = true },
@@ -195,6 +303,25 @@ static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_HELP,            .handler = help_action,         .uithread = true },
     { .action = ACTION_EMUDIS_HISTORY,         .handler = history_action,      .uithread = true },
     { .action = ACTION_EMUDIS_ABOUT,           .handler = about_action,        .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_1, .handler = turbo_action, .data = vice_int_to_ptr(1), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_2, .handler = turbo_action, .data = vice_int_to_ptr(2), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_3, .handler = turbo_action, .data = vice_int_to_ptr(3), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_4, .handler = turbo_action, .data = vice_int_to_ptr(4), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_5, .handler = turbo_action, .data = vice_int_to_ptr(5), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_6, .handler = turbo_action, .data = vice_int_to_ptr(6), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_8, .handler = turbo_action, .data = vice_int_to_ptr(8), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_10, .handler = turbo_action, .data = vice_int_to_ptr(10), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_12, .handler = turbo_action, .data = vice_int_to_ptr(12), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_14, .handler = turbo_action, .data = vice_int_to_ptr(14), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_20, .handler = turbo_action, .data = vice_int_to_ptr(20), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_24, .handler = turbo_action, .data = vice_int_to_ptr(24), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_32, .handler = turbo_action, .data = vice_int_to_ptr(32), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_40, .handler = turbo_action, .data = vice_int_to_ptr(40), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_48, .handler = turbo_action, .data = vice_int_to_ptr(48), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_65, .handler = turbo_action, .data = vice_int_to_ptr(65), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_77, .handler = turbo_action, .data = vice_int_to_ptr(77), .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_TOGGLE, .handler = turbo_toggle_action, .uithread = true },
+    { .action = ACTION_EMUDIS_TURBO_LOAD_PAUSE_TOGGLE, .handler = turbo_load_pause_action, .uithread = true },
     UI_ACTION_MAP_TERMINATOR
 };
 
@@ -211,4 +338,11 @@ void actions_emudis_setup_ui(void)
             (gboolean)(software_renderer_get_choice() == EMUDIS_RENDERER_SOFTWARE));
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_FASTLOAD_TOGGLE,
                                              (gboolean)emudis_fastload_get());
+    if (machine_class == VICE_MACHINE_C64SC) {
+        int speed = lock_get_int("EmuDisTurbo");
+        if (speed > 1) {
+            turbo_last = speed;
+        }
+        turbo_update_menu();
+    }
 }

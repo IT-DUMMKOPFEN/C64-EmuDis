@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include "c64turbo.h"
 #include "cpmcart.h"
 #include "monitor.h"
 #include "vicii-cycle.h"
@@ -44,11 +45,22 @@ CLOCK maincpu_clk_limit = 0L;
 /* Mask: BA low */
 int maincpu_ba_low_flags = 0;
 
-#define CLK_INC()                                  \
-    interrupt_delay();                             \
-    maincpu_clk++;                                 \
-    maincpu_ba_low_flags &= ~MAINCPU_BA_LOW_VICII; \
-    maincpu_ba_low_flags |= vicii_cycle()
+/* C64-EmuDis CPU turbo (c64turbo.c): with a turbo factor N only every Nth
+   CPU cycle is a system cycle (VIC-II, CIAs, SID, drives); the cycles in
+   between only run the CPU. Stalls by the VIC-II (BA low) still wait for
+   real system cycles. */
+#define CLK_INC()                                      \
+    do {                                               \
+        if (c64turbo_div > 1                           \
+            && ++c64turbo_sub < c64turbo_div) {        \
+            break;                                     \
+        }                                              \
+        c64turbo_sub = 0;                              \
+        interrupt_delay();                             \
+        maincpu_clk++;                                 \
+        maincpu_ba_low_flags &= ~MAINCPU_BA_LOW_VICII; \
+        maincpu_ba_low_flags |= vicii_cycle();         \
+    } while (0)
 
 
 /* Skip cycle implementation */

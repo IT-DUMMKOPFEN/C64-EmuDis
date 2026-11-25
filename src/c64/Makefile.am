@@ -98,6 +98,8 @@ libc64_a_SOURCES = \
 	c64-snapshot.h \
 	c64.c \
 	c64.h \
+	c64turbo.c \
+	c64turbo.h \
 	c64_256k.c \
 	c64_256k.h \
 	c64bus.c \
@@ -161,6 +163,8 @@ libc64sc_a_SOURCES = \
 	c64-snapshot.h \
 	c64.c \
 	c64.h \
+	c64turbo.c \
+	c64turbo.h \
 	c64_256k.c \
 	c64_256k.h \
 	c64bus.c \
@@ -229,6 +233,8 @@ libc64c128_a_SOURCES = \
 	c64cart.h \
 	c64cia.h \
 	c64cia2.c \
+	c64turbo.c \
+	c64turbo.h \
 	c64datasette.c \
 	c64export.c \
 	c64gluelogic.c \
@@ -259,6 +265,8 @@ libc64scpu64_a_SOURCES = \
 	c64cia.h \
 	c64cia1.c \
 	c64cia2.c \
+	c64turbo.c \
+	c64turbo.h \
 	c64datasette.c \
 	c64drive.c \
 	c64export.c \

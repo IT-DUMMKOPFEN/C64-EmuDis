@@ -87,6 +87,9 @@ void datasette_set_tape_image(int port, struct tap_s *image);
 void datasette_control(int port, int command);
 void datasette_reset(void);
 void datasette_reset_counter(int port);
+
+/* C64-EmuDis: a tape is playing (play pressed, motor on) */
+int datasette_emudis_is_playing(void);
 void datasette_event_playback_port1(CLOCK offset, void *data);
 void datasette_event_playback_port2(CLOCK offset, void *data);
 

@@ -40,6 +40,7 @@
 #include "c64-resources.h"
 #include "c64-snapshot.h"
 #include "c64.h"
+#include "c64turbo.h"
 #include "c64_256k.h"
 #include "c64cart.h"
 #define CARTRIDGE_INCLUDE_SLOTMAIN_API
@@ -696,6 +697,10 @@ int machine_resources_init(void)
         init_resource_fail("c64");
         return -1;
     }
+    if (c64turbo_resources_init() < 0) {
+        init_resource_fail("c64turbo");
+        return -1;
+    }
     if (export_resources_init() < 0) {
         init_resource_fail("c64export");
         return -1;
@@ -864,6 +869,10 @@ int machine_cmdline_options_init(void)
     /* FIXME: we might want to move this into machine.c or init.c */
     if (maincpu_cmdline_options_init() < 0) {
         init_cmdline_options_fail("maincpu");
+        return -1;
+    }
+    if (c64turbo_cmdline_options_init() < 0) {
+        init_cmdline_options_fail("c64turbo");
         return -1;
     }
     if (c64_cmdline_options_init() < 0) {
@@ -1269,6 +1278,8 @@ static void machine_vsync_hook(void)
     network_hook();
 
     drive_vsync_hook();
+
+    c64turbo_vsync();
 
     screenshot_record();
 }

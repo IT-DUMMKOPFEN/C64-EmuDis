@@ -29,6 +29,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `data/hotkeys/hotkeys-emudis.vhk` | default hotkeys for the tools |
 | `packaging/*` | distribution scripts (Linux, Windows, macOS; Windows/macOS based on VICE's bindist scripts) |
 | `android/`, `packaging/android/build-native.sh`, `.github/workflows/android.yml` | Android app: VICE x64sc with the SDL2 UI plus touch keyboard overlay, touch joystick (port 1/2) and buttons |
+| `src/c64/c64turbo.c/.h` | CPU turbo 2 - 77 MHz (Ultimate 64 style): the CPU runs N cycles per system cycle, paused while the serial bus, a drive head or the tape is busy |
 | `src/arch/sdl/emudis_sdl.c/.h` | SDL UI: C64-EmuDis hooks and the Android JNI bridge (touch controls as SDL user events) |
 | `.github/workflows/build.yml` | CI builds for all three platforms |
 
@@ -45,6 +46,12 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/shared/archdep_get_vice_datadir.c` | Android: data directory from `EMUDIS_DATADIR` (set by the app) |
 | `src/arch/sdl/ui.c`, `src/arch/sdl/Makefile.am` | SDL UI: handle the Android touch control events |
 | `src/arch/shared/archdep_exit.c` | Android: end with `_exit()` (exit() crashed the Android UI threads) |
+| `src/c64/c64cpusc.c` | CPU turbo: only every Nth CPU cycle is a system cycle (`CLK_INC`) |
+| `src/c64/c64cia2.c` | CPU turbo: pause it at once when the serial bus lines change |
+| `src/c64/c64.c`, `src/c64/Makefile.am` | CPU turbo resources, command line, per-frame check |
+| `src/datasette/datasette.c/.h` | `datasette_emudis_is_playing()` for the CPU turbo |
+| `src/arch/headless/ui.c` | C64-EmuDis hooks for the headless UI (used for tests) |
+| `src/arch/sdl/x64sc_ui.c` | Android/SDL menu "CPU turbo (C64-EmuDis)" |
 | `src/log.c` | log without colours to stdout also when the log file could not be opened (crash) |
 | `src/arch/sdl/uimenu.c/.h`, `src/arch/sdl/uimon.c` | Android: the keyboard stays open while the monitor is open (it was hidden and shown again for every key); the C64 keyboard overlay types into the menu and the monitor |
 | `src/monitor/monitor.c`, `mon_command.c` | Android: monitor command `quit` (q) leaves the monitor like `exit` instead of ending the app |

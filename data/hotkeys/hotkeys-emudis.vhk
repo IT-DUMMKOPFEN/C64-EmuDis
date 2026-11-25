@@ -17,6 +17,7 @@
     emudis-snapshot-manager     <Alt><Shift>k
     emudis-video-toggle         <Alt><Shift>v
     emudis-screenshot           <Alt><Shift>x
+    emudis-turbo-toggle         <Alt><Shift>u
 !else
     emudis-memory-viewer        <Command><Shift>m
     emudis-full-memory-view     <Command><Shift>w
@@ -29,4 +30,5 @@
     emudis-snapshot-manager     <Command><Shift>k
     emudis-video-toggle         <Command><Shift>v
     emudis-screenshot           <Command><Shift>x
+    emudis-turbo-toggle         <Command><Shift>u
 !endif

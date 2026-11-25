@@ -961,6 +961,92 @@ static const ui_menu_item_t debug_menu_c64dtv[] = {
 /* }}} */
 #endif
 
+/* {{{ turbo_submenu[] */
+/** \brief  C64-EmuDis 'Tools' -> 'C64 CPU turbo' submenu
+ */
+static const ui_menu_item_t turbo_submenu[] = {
+    {   .label    = "Normal C64 speed (1 MHz)",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_1
+    },
+    UI_MENU_SEPARATOR,
+    {   .label    = "2 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_2
+    },
+    {   .label    = "3 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_3
+    },
+    {   .label    = "4 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_4
+    },
+    {   .label    = "5 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_5
+    },
+    {   .label    = "6 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_6
+    },
+    {   .label    = "8 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_8
+    },
+    {   .label    = "10 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_10
+    },
+    {   .label    = "12 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_12
+    },
+    {   .label    = "14 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_14
+    },
+    {   .label    = "20 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_20
+    },
+    {   .label    = "24 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_24
+    },
+    {   .label    = "32 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_32
+    },
+    {   .label    = "40 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_40
+    },
+    {   .label    = "48 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_48
+    },
+    {   .label    = "65 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_65
+    },
+    {   .label    = "77 MHz",
+        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
+        .action   = ACTION_EMUDIS_TURBO_77
+    },
+    UI_MENU_SEPARATOR,
+    {   .label    = "Turbo on/off",
+        .type     = UI_MENU_TYPE_ITEM_ACTION,
+        .action   = ACTION_EMUDIS_TURBO_TOGGLE
+    },
+    {   .label    = "Normal speed while loading (recommended)",
+        .type     = UI_MENU_TYPE_ITEM_CHECK,
+        .action   = ACTION_EMUDIS_TURBO_LOAD_PAUSE_TOGGLE
+    },
+    UI_MENU_TERMINATOR
+};
+/* }}} */
+
 /* {{{ tools_menu[] */
 /** \brief  C64-EmuDis 'Tools' menu
  */
@@ -1017,6 +1103,10 @@ static const ui_menu_item_t tools_menu[] = {
         .action   = ACTION_EMUDIS_VIDEO_TOGGLE
     },
     UI_MENU_SEPARATOR,
+    {   .label    = "C64 CPU turbo",
+        .type     = UI_MENU_TYPE_SUBMENU,
+        .submenu  = turbo_submenu
+    },
     {   .label    = "Warp while loading (no loading times)",
         .type     = UI_MENU_TYPE_ITEM_CHECK,
         .action   = ACTION_EMUDIS_FASTLOAD_TOGGLE

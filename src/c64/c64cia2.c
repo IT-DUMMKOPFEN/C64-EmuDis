@@ -35,6 +35,7 @@
 #include "c64fastiec.h"
 #include "c64-resources.h"
 #include "c64.h"
+#include "c64turbo.h"
 #include "c64mem.h"
 #include "c64iec.h"
 #include "c64cia.h"
@@ -138,6 +139,10 @@ static void store_ciapa(cia_context_t *cia_context, CLOCK rclk, uint8_t byte)
     if (cia_context->old_pa != byte) {
         uint8_t tmp;
         int new_vbank;
+
+        if ((cia_context->old_pa ^ byte) & 0x38) {
+            c64turbo_iec_write();   /* C64-EmuDis: pause the CPU turbo */
+        }
 
         if ((cia_context->old_pa ^ byte) & 4) {
             store_userport_pa2((uint8_t)((byte & 4) >> 2));
