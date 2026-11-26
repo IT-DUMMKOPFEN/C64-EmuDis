@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Create a GitHub release with this tag (e.g. v0.5b), empty = no release'
+        description: 'Create a GitHub release with this tag (e.g. v0.9), empty = no release'
         required: false
         default: ''
 
@@ -386,6 +386,15 @@ jobs:
             | macOS 12+ (Apple Silicon) | `C64-EmuDis-*-macos-arm64.dmg` | drag to Applications, first start: right-click -> Open (not notarized) |
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.AppImage` | **recommended**: `chmod +x C64-EmuDis-*.AppImage`, then start it (GTK 3, GLEW, ffmpeg included) |
             | Linux (x86_64) | `C64-EmuDis-*-linux-x86_64.tar.gz` | small portable folder: extract, run `./C64-EmuDis` (needs GTK 3, GLEW, ffmpeg) |
+
+            **New in 0.9**
+            - *Tools -> C64 CPU turbo*: the C64 CPU at 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40,
+              48, 65 or 77 MHz like the Ultimate 64 turbo modes (real MHz for PAL and NTSC); picture,
+              sound and timers keep their normal speed. "Turbo on" switches it on and off
+              (Alt+Shift+U, macOS Cmd+Shift+U); the status bar shows whether it is on. Normal speed
+              automatically while a disk or tape loads.
+            - Android test version (`C64-EmuDis-*-android.apk`): touch keyboard, touch joystick
+              (port 1/2), keyboard in the monitor
 
             **New in 0.5b**
             - *Tools -> Sprites on screen* (Alt+Shift+E, macOS Cmd+Shift+E): live red frames with
