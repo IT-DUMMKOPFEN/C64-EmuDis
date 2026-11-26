@@ -969,7 +969,8 @@ static const ui_menu_item_t turbo_submenu[] = {
         .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
         .action   = ACTION_EMUDIS_TURBO_1
     },
-    UI_MENU_SEPARATOR,
+    /* no separator here: a separator ends the radio group, "Normal" could
+       then no longer be chosen again */
     {   .label    = "2 MHz",
         .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
         .action   = ACTION_EMUDIS_TURBO_2
