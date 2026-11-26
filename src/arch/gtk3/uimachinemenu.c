@@ -965,12 +965,11 @@ static const ui_menu_item_t debug_menu_c64dtv[] = {
 /** \brief  C64-EmuDis 'Tools' -> 'C64 CPU turbo' submenu
  */
 static const ui_menu_item_t turbo_submenu[] = {
-    {   .label    = "Normal C64 speed (1 MHz)",
-        .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
-        .action   = ACTION_EMUDIS_TURBO_1
+    {   .label    = "Turbo on",
+        .type     = UI_MENU_TYPE_ITEM_CHECK,
+        .action   = ACTION_EMUDIS_TURBO_TOGGLE
     },
-    /* no separator here: a separator ends the radio group, "Normal" could
-       then no longer be chosen again */
+    UI_MENU_SEPARATOR,
     {   .label    = "2 MHz",
         .type     = UI_MENU_TYPE_ITEM_RADIO_INT,
         .action   = ACTION_EMUDIS_TURBO_2
@@ -1036,10 +1035,6 @@ static const ui_menu_item_t turbo_submenu[] = {
         .action   = ACTION_EMUDIS_TURBO_77
     },
     UI_MENU_SEPARATOR,
-    {   .label    = "Turbo on/off",
-        .type     = UI_MENU_TYPE_ITEM_ACTION,
-        .action   = ACTION_EMUDIS_TURBO_TOGGLE
-    },
     {   .label    = "Normal speed while loading (recommended)",
         .type     = UI_MENU_TYPE_ITEM_CHECK,
         .action   = ACTION_EMUDIS_TURBO_LOAD_PAUSE_TOGGLE

@@ -68,6 +68,10 @@
 #include "types.h"
 #include "videoarch.h"
 #include "vsync.h"
+#include "emudis_hooks.h"
+
+/* C64-EmuDis: set by c64/c64turbo.c (see emudis_hooks.h) */
+void (*emudis_turbo_info)(emudis_turbo_info_t *info) = NULL;
 #include "vsyncapi.h"
 
 #include "ui.h"

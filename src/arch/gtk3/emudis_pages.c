@@ -110,14 +110,21 @@ static const char *help_text =
 
     H2("C64 CPU turbo")
     P("<i>Tools → C64 CPU turbo</i> makes the C64 CPU faster, like the turbo modes of the "
-      "Ultimate 64: 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40, 48, 65 or 77 MHz instead of the "
-      "normal 1 MHz. " KBD("Alt+Shift+U") " switches the turbo on and off (the last speed is kept).")
+      "Ultimate 64. Tick <b>Turbo on</b> and choose the speed: 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, "
+      "24, 32, 40, 48, 65 or 77 MHz. With <b>Turbo on</b> unticked the C64 always runs at its "
+      "normal speed: 0.985 MHz (PAL) or 1.023 MHz (NTSC). " KBD("Alt+Shift+U") " switches the "
+      "turbo on and off.")
+    LI("The status bar at the bottom shows the state: <b>TURBO 20 MHz</b> (red) when it is on, "
+       "<i>paused: loading</i> (orange) while a disk or tape loads, <i>Turbo off</i> with the normal "
+       "clock otherwise. Click it to switch the turbo on or off.")
+    LI("The speeds are real MHz for PAL and NTSC: 2 MHz is 2.03 times a PAL C64 and 1.96 times "
+       "an NTSC C64.")
     LI("Only the CPU gets faster: the picture, the music and the timers keep their normal speed, "
        "so programs simply calculate faster (BASIC, packers, 3D and vector demos, slow games).")
     LI("Loaders count CPU cycles, so the turbo pauses automatically while the C64 talks to a disk "
        "drive or a tape plays and comes back half a second later (<i>Normal speed while loading</i>).")
     LI("Games and demos that rely on exact CPU timing (raster effects, music players called from "
-       "loops) can run too fast or look wrong; switch back to <i>Normal C64 speed</i> for them.")
+       "loops) can run too fast or look wrong; switch the turbo off for them.")
     LI("High speeds need a fast computer: if the emulator cannot keep up, everything slows down "
        "instead (the speed display shows less than 100%).")
 

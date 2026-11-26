@@ -29,7 +29,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `data/hotkeys/hotkeys-emudis.vhk` | default hotkeys for the tools |
 | `packaging/*` | distribution scripts (Linux, Windows, macOS; Windows/macOS based on VICE's bindist scripts) |
 | `android/`, `packaging/android/build-native.sh`, `.github/workflows/android.yml` | Android app: VICE x64sc with the SDL2 UI plus touch keyboard overlay, touch joystick (port 1/2) and buttons |
-| `src/c64/c64turbo.c/.h` | CPU turbo 2 - 77 MHz (Ultimate 64 style): the CPU runs N cycles per system cycle, paused while the serial bus, a drive head or the tape is busy |
+| `src/c64/c64turbo.c/.h` | CPU turbo 2 - 77 MHz (Ultimate 64 style, real MHz for PAL and NTSC): on/off switch, paused while the serial bus, a drive head or the tape is busy |
 | `src/arch/sdl/emudis_sdl.c/.h` | SDL UI: C64-EmuDis hooks and the Android JNI bridge (touch controls as SDL user events) |
 | `.github/workflows/build.yml` | CI builds for all three platforms |
 
@@ -46,7 +46,9 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/arch/shared/archdep_get_vice_datadir.c` | Android: data directory from `EMUDIS_DATADIR` (set by the app) |
 | `src/arch/sdl/ui.c`, `src/arch/sdl/Makefile.am` | SDL UI: handle the Android touch control events |
 | `src/arch/shared/archdep_exit.c` | Android: end with `_exit()` (exit() crashed the Android UI threads) |
-| `src/c64/c64cpusc.c` | CPU turbo: only every Nth CPU cycle is a system cycle (`CLK_INC`) |
+| `src/c64/c64cpusc.c` | CPU turbo: a fixed point accumulator decides which CPU cycles are system cycles (`CLK_INC`) |
+| `src/vsync.c`, `src/emudis_hooks.h` | hook for the CPU turbo state (status bar) |
+| `src/arch/gtk3/uistatusbar.c` | status bar: CPU turbo display (click to switch it on/off) |
 | `src/c64/c64cia2.c` | CPU turbo: pause it at once when the serial bus lines change |
 | `src/c64/c64.c`, `src/c64/Makefile.am` | CPU turbo resources, command line, per-frame check |
 | `src/datasette/datasette.c/.h` | `datasette_emudis_is_playing()` for the CPU turbo |

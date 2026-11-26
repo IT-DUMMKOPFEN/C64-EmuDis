@@ -105,6 +105,8 @@
 #include "vice_gtk3.h"
 
 #include "emudis.h"
+#include "emudis_hooks.h"
+#include "uiactions.h"
 #include "uistatusbar.h"
 
 /* #define DEBUG_STATUSBAR */
@@ -455,6 +457,15 @@ typedef struct ui_statusbar_s {
 
     /** \brief  Stateful data used by the speed widget */
     statusbar_speed_widget_state_t speed_state;
+
+    /** \brief  C64-EmuDis CPU turbo display (x64sc) */
+    GtkWidget *emudis_turbo;
+
+    /** \brief  C64-EmuDis CPU turbo display: label inside emudis_turbo */
+    GtkWidget *emudis_turbo_label;
+
+    /** \brief  C64-EmuDis CPU turbo display: state shown (-1 = none yet) */
+    int emudis_turbo_shown;
 
     /** \brief  Status bar messages */
     GtkWidget *msg;
@@ -1262,6 +1273,9 @@ static void destroy_statusbar_cb(GtkWidget *sb, gpointer index)
     bar->supercpu_turbo_led = NULL;
     bar->supercpu_jiffy_led = NULL;
     bar->speed = NULL;
+    bar->emudis_turbo = NULL;
+    bar->emudis_turbo_label = NULL;
+    bar->emudis_turbo_shown = -1;
     bar->msg = NULL;
     bar->record = NULL;
     bar->crt = NULL;
@@ -2398,6 +2412,70 @@ static void statusbar_append_widget(int bar, GtkWidget *widget, gboolean separat
 }
 
 
+/* --- C64-EmuDis: CPU turbo display ---------------------------------------- */
+
+/* click on the display: switch the turbo on/off */
+static gboolean on_emudis_turbo_clicked(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+        ui_action_trigger(ACTION_EMUDIS_TURBO_TOGGLE);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static GtkWidget *emudis_turbo_widget_create(GtkWidget **label)
+{
+    GtkWidget *box = gtk_event_box_new();
+
+    *label = gtk_label_new(NULL);
+    gtk_widget_set_margin_start(*label, 8);
+    gtk_widget_set_margin_end(*label, 8);
+    gtk_label_set_xalign(GTK_LABEL(*label), 0.0f);
+    gtk_container_add(GTK_CONTAINER(box), *label);
+    gtk_widget_set_tooltip_text(box, "C64 CPU turbo - click to switch it on or off "
+                                     "(Tools -> C64 CPU turbo)");
+    g_signal_connect(box, "button-press-event", G_CALLBACK(on_emudis_turbo_clicked), NULL);
+    gtk_widget_show_all(box);
+    return box;
+}
+
+/* show the turbo state; only redrawn when it changes */
+static void emudis_turbo_widget_update(ui_statusbar_t *bar)
+{
+    emudis_turbo_info_t info = { 0, 0, 0, 0 };
+    int enabled, paused, speed, state;
+    long hz;
+    char *markup;
+
+    if (emudis_turbo_info == NULL) {
+        return;
+    }
+    emudis_turbo_info(&info);
+    enabled = info.enabled;
+    paused = info.paused;
+    speed = info.speed;
+    hz = info.system_hz;
+    state = (enabled ? 1 : 0) | (paused ? 2 : 0) | (speed << 2) | (int)((hz / 1000) << 10);
+
+    if (bar->emudis_turbo_label == NULL || state == bar->emudis_turbo_shown) {
+        return;
+    }
+    bar->emudis_turbo_shown = state;
+    if (!enabled) {
+        markup = lib_msprintf("Turbo off  <span foreground='#888888'>(%.3f MHz)</span>",
+                              (double)hz / 1000000.0);
+    } else if (paused) {
+        markup = lib_msprintf("<b><span foreground='#e08000'>TURBO %d MHz</span></b>"
+                              "  <span foreground='#e08000'>paused: loading</span>", speed);
+    } else {
+        markup = lib_msprintf("<b><span foreground='#ff3030'>TURBO %d MHz</span></b>", speed);
+    }
+    gtk_label_set_markup(GTK_LABEL(bar->emudis_turbo_label), markup);
+    lib_free(markup);
+}
+
+
 /** \brief  Append a widget to the top row of a status bar at the end
  *
  * Append \a widget to status bar with index \a bar.
@@ -2666,6 +2744,13 @@ GtkWidget *ui_statusbar_create(int window_identity)
     gtk_widget_set_margin_start(speed, 8);
     allocated_bars[i].speed = speed;
 
+    /* C64-EmuDis: CPU turbo display (x64sc only) */
+    if (machine_class == VICE_MACHINE_C64SC) {
+        allocated_bars[i].emudis_turbo =
+            emudis_turbo_widget_create(&allocated_bars[i].emudis_turbo_label);
+        allocated_bars[i].emudis_turbo_shown = -1;
+    }
+
     /* CRT and Mixer controls */
     if (machine_class != VICE_MACHINE_VSID) {
         crt = gtk_check_button_new_with_label("CRT");
@@ -2815,6 +2900,9 @@ GtkWidget *ui_statusbar_create(int window_identity)
      */
     if (speed != NULL) {
         statusbar_append_widget(i, speed, FALSE);
+    }
+    if (allocated_bars[i].emudis_turbo != NULL) {
+        statusbar_append_widget(i, allocated_bars[i].emudis_turbo, TRUE);
     }
     if (checkboxes != NULL) {
         statusbar_append_widget(i, checkboxes, TRUE);
@@ -3490,6 +3578,9 @@ void ui_update_statusbars(void)
         if (speed_widget != NULL) {
             statusbar_speed_widget_update(speed_widget, &bar->speed_state, bar->window_identity);
         }
+
+        /* C64-EmuDis: CPU turbo */
+        emudis_turbo_widget_update(bar);
 
         /*
          * Update Tape

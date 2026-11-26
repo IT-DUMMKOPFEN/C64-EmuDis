@@ -91,16 +91,17 @@ static UI_MENU_CALLBACK(Machine_dynmenu_callback)
 }
 
 /* C64-EmuDis: CPU turbo (c64/c64turbo.c), like the Ultimate 64 turbo modes */
+UI_MENU_DEFINE_TOGGLE(EmuDisTurboEnabled)
 UI_MENU_DEFINE_RADIO(EmuDisTurbo)
 UI_MENU_DEFINE_TOGGLE(EmuDisTurboLoadPause)
 
 static const ui_menu_entry_t emudis_turbo_menu[] = {
-    SDL_MENU_ITEM_TITLE("C64 CPU speed"),
-    {   .string   = "Normal (1 MHz)",
-        .type     = MENU_ENTRY_RESOURCE_RADIO,
-        .callback = radio_EmuDisTurbo_callback,
-        .data     = (ui_callback_data_t)1
+    {   .string   = "Turbo on (off: normal C64 speed)",
+        .type     = MENU_ENTRY_RESOURCE_TOGGLE,
+        .callback = toggle_EmuDisTurboEnabled_callback
     },
+    SDL_MENU_ITEM_SEPARATOR,
+    SDL_MENU_ITEM_TITLE("Turbo speed"),
     {   .string   = "2 MHz",
         .type     = MENU_ENTRY_RESOURCE_RADIO,
         .callback = radio_EmuDisTurbo_callback,
@@ -253,7 +254,7 @@ static ui_menu_entry_t x64sc_main_menu[] = {
     },
     {   .string   = "CPU turbo (C64-EmuDis)",
         .type     = MENU_ENTRY_SUBMENU,
-        .callback = submenu_radio_callback,
+        .callback = submenu_callback,
         .data     = (ui_callback_data_t)emudis_turbo_menu
     },
     {   .string   = "Reset",

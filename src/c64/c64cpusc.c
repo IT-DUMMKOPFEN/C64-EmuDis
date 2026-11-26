@@ -45,17 +45,20 @@ CLOCK maincpu_clk_limit = 0L;
 /* Mask: BA low */
 int maincpu_ba_low_flags = 0;
 
-/* C64-EmuDis CPU turbo (c64turbo.c): with a turbo factor N only every Nth
-   CPU cycle is a system cycle (VIC-II, CIAs, SID, drives); the cycles in
-   between only run the CPU. Stalls by the VIC-II (BA low) still wait for
-   real system cycles. */
+/* C64-EmuDis CPU turbo (c64turbo.c): while the turbo runs, each CPU cycle
+   adds (system clock / turbo clock) to an accumulator, and only when it
+   passes 1.0 a system cycle happens (VIC-II, CIAs, SID, drives); the cycles
+   in between only run the CPU. Stalls by the VIC-II (BA low) still wait for
+   real system cycles. With the turbo off every CPU cycle is a system cycle. */
 #define CLK_INC()                                      \
     do {                                               \
-        if (c64turbo_div > 1                           \
-            && ++c64turbo_sub < c64turbo_div) {        \
-            break;                                     \
+        if (c64turbo_active) {                         \
+            c64turbo_acc += c64turbo_step;             \
+            if (c64turbo_acc < C64TURBO_ONE) {         \
+                break;                                 \
+            }                                          \
+            c64turbo_acc -= C64TURBO_ONE;              \
         }                                              \
-        c64turbo_sub = 0;                              \
         interrupt_delay();                             \
         maincpu_clk++;                                 \
         maincpu_ba_low_flags &= ~MAINCPU_BA_LOW_VICII; \

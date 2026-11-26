@@ -180,9 +180,8 @@ static void sprite_overlay_action(ui_action_map_t *self)
 
 /* --- CPU turbo (c64/c64turbo.c) ------------------------------------------ */
 
-static const int turbo_speeds[] = { 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40, 48, 65, 77 };
+static const int turbo_speeds[] = { 2, 3, 4, 5, 6, 8, 10, 12, 14, 20, 24, 32, 40, 48, 65, 77 };
 static const int turbo_actions[] = {
-    ACTION_EMUDIS_TURBO_1,
     ACTION_EMUDIS_TURBO_2,
     ACTION_EMUDIS_TURBO_3,
     ACTION_EMUDIS_TURBO_4,
@@ -200,7 +199,6 @@ static const int turbo_actions[] = {
     ACTION_EMUDIS_TURBO_65,
     ACTION_EMUDIS_TURBO_77,
 };
-static int turbo_last = 8;      /* turbo speed for "turbo on/off" */
 
 static int lock_get_int(const char *name)
 {
@@ -230,12 +228,14 @@ static void lock_set_int(const char *name, int v)
     }
 }
 
-/* menu state: the radio item of the current speed, the "while loading" check */
+/* menu state: "Turbo on" check, the radio item of the speed, "while loading" */
 static void turbo_update_menu(void)
 {
     int speed = lock_get_int("EmuDisTurbo");
     size_t i;
 
+    vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_TURBO_TOGGLE,
+            (gboolean)(lock_get_int("EmuDisTurboEnabled") != 0));
     for (i = 0; i < sizeof turbo_speeds / sizeof turbo_speeds[0]; i++) {
         if (turbo_speeds[i] == speed) {
             vhk_gtk_set_check_item_blocked_by_action(turbo_actions[i], TRUE);
@@ -245,34 +245,33 @@ static void turbo_update_menu(void)
             (gboolean)(lock_get_int("EmuDisTurboLoadPause") != 0));
 }
 
-static void turbo_set(int speed)
+static void turbo_show_state(void)
 {
     char *msg;
 
-    if (speed > 1) {
-        turbo_last = speed;
-    }
-    lock_set_int("EmuDisTurbo", speed);
-    turbo_update_menu();
-    if (speed > 1) {
-        msg = lib_msprintf("CPU turbo: %d MHz (%dx normal speed)", speed, speed);
+    if (lock_get_int("EmuDisTurboEnabled")) {
+        msg = lib_msprintf("CPU turbo ON: %d MHz", lock_get_int("EmuDisTurbo"));
     } else {
-        msg = lib_strdup("CPU turbo off: normal C64 speed (1 MHz)");
+        msg = lib_strdup("CPU turbo OFF: normal C64 speed");
     }
     ui_display_statustext(msg, true);
     lib_free(msg);
 }
 
+/* choosing a speed switches the turbo on */
 static void turbo_action(ui_action_map_t *self)
 {
-    turbo_set(vice_ptr_to_int(self->data));
+    lock_set_int("EmuDisTurbo", vice_ptr_to_int(self->data));
+    lock_set_int("EmuDisTurboEnabled", 1);
+    turbo_update_menu();
+    turbo_show_state();
 }
 
 static void turbo_toggle_action(ui_action_map_t *self)
 {
-    int speed = lock_get_int("EmuDisTurbo");
-
-    turbo_set(speed > 1 ? 1 : turbo_last);
+    lock_set_int("EmuDisTurboEnabled", !lock_get_int("EmuDisTurboEnabled"));
+    turbo_update_menu();
+    turbo_show_state();
 }
 
 static void turbo_load_pause_action(ui_action_map_t *self)
@@ -303,7 +302,6 @@ static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_HELP,            .handler = help_action,         .uithread = true },
     { .action = ACTION_EMUDIS_HISTORY,         .handler = history_action,      .uithread = true },
     { .action = ACTION_EMUDIS_ABOUT,           .handler = about_action,        .uithread = true },
-    { .action = ACTION_EMUDIS_TURBO_1, .handler = turbo_action, .data = vice_int_to_ptr(1), .uithread = true },
     { .action = ACTION_EMUDIS_TURBO_2, .handler = turbo_action, .data = vice_int_to_ptr(2), .uithread = true },
     { .action = ACTION_EMUDIS_TURBO_3, .handler = turbo_action, .data = vice_int_to_ptr(3), .uithread = true },
     { .action = ACTION_EMUDIS_TURBO_4, .handler = turbo_action, .data = vice_int_to_ptr(4), .uithread = true },
@@ -339,10 +337,6 @@ void actions_emudis_setup_ui(void)
     vhk_gtk_set_check_item_blocked_by_action(ACTION_EMUDIS_FASTLOAD_TOGGLE,
                                              (gboolean)emudis_fastload_get());
     if (machine_class == VICE_MACHINE_C64SC) {
-        int speed = lock_get_int("EmuDisTurbo");
-        if (speed > 1) {
-            turbo_last = speed;
-        }
         turbo_update_menu();
     }
 }
