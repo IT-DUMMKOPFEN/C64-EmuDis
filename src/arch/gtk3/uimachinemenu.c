@@ -1090,6 +1090,10 @@ static const ui_menu_item_t tools_menu[] = {
         .type     = UI_MENU_TYPE_ITEM_ACTION,
         .action   = ACTION_EMUDIS_SCREENSHOT
     },
+    {   .label    = "Take screenshot (PNG, no border, 320x200)",
+        .type     = UI_MENU_TYPE_ITEM_ACTION,
+        .action   = ACTION_EMUDIS_SCREENSHOT_NO_BORDER
+    },
     {   .label    = "Video recorder (MP4)...",
         .type     = UI_MENU_TYPE_ITEM_ACTION,
         .action   = ACTION_EMUDIS_VIDEO

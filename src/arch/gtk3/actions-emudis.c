@@ -86,20 +86,26 @@ static void with_lock(void (*fn)(void))
     }
 }
 
-static void take_screenshot(void)
+static void save_screenshot(bool no_border)
 {
     const char *dir = g_get_user_special_dir(G_USER_DIRECTORY_PICTURES);
     GDateTime *now = g_date_time_new_now_local();
     gchar *stamp = g_date_time_format(now, "%Y%m%d-%H%M%S");
-    char *name = lib_msprintf("c64-emudis-%s.png", stamp);
+    char *name = lib_msprintf(no_border ? "c64-emudis-%s-320x200.png" : "c64-emudis-%s.png", stamp);
     char *path;
     char *msg;
+    int res;
 
     if (dir == NULL || !g_file_test(dir, G_FILE_TEST_IS_DIR)) {
         dir = g_get_home_dir();
     }
     path = util_join_paths(dir, name, NULL);
-    if (screenshot_save("PNG", path, ui_get_active_canvas()) < 0) {
+    if (no_border) {
+        res = screenshot_save_no_border("PNG", path, ui_get_active_canvas());
+    } else {
+        res = screenshot_save("PNG", path, ui_get_active_canvas());
+    }
+    if (res < 0) {
         msg = lib_msprintf("Screenshot failed: %s", path);
     } else {
         msg = lib_msprintf("Screenshot saved: %s", path);
@@ -111,6 +117,9 @@ static void take_screenshot(void)
     g_free(stamp);
     g_date_time_unref(now);
 }
+
+static void take_screenshot(void)           { save_screenshot(false); }
+static void take_screenshot_no_border(void) { save_screenshot(true); }
 
 
 /* ------------------------------------------------------------------------ */
@@ -128,6 +137,7 @@ static void snapshots_action(ui_action_map_t *self)    { with_lock(emudis_snapsh
 static void video_action(ui_action_map_t *self)        { with_lock(emudis_video_show); }
 static void video_toggle_action(ui_action_map_t *self) { with_lock(emudis_video_quick_toggle); }
 static void screenshot_action(ui_action_map_t *self)   { with_lock(take_screenshot); }
+static void screenshot_nb_action(ui_action_map_t *self) { with_lock(take_screenshot_no_border); }
 static void help_action(ui_action_map_t *self)         { emudis_help_show(); }
 static void history_action(ui_action_map_t *self)      { emudis_history_show(); }
 static void about_action(ui_action_map_t *self)        { emudis_about_show(); }
@@ -296,6 +306,7 @@ static const ui_action_map_t emudis_actions[] = {
     { .action = ACTION_EMUDIS_VIDEO,           .handler = video_action,        .uithread = true },
     { .action = ACTION_EMUDIS_VIDEO_TOGGLE,    .handler = video_toggle_action, .uithread = true },
     { .action = ACTION_EMUDIS_SCREENSHOT,      .handler = screenshot_action,   .uithread = true },
+    { .action = ACTION_EMUDIS_SCREENSHOT_NO_BORDER, .handler = screenshot_nb_action, .uithread = true },
     { .action = ACTION_EMUDIS_FASTLOAD_TOGGLE, .handler = fastload_action,     .uithread = true },
     { .action = ACTION_EMUDIS_SOFTRENDER_TOGGLE, .handler = softrender_action, .uithread = true },
     { .action = ACTION_EMUDIS_SPRITE_OVERLAY_TOGGLE, .handler = sprite_overlay_action, .uithread = true },

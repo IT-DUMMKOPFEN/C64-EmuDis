@@ -31,7 +31,7 @@ Author: **IT-Dummkopfen** · License: **GPL-2.0-or-later** (see [Why GPL?](#lice
 | **Disassembler** | Listing or re-assemblable ACME / Kick Assembler source with automatic and system labels, live CPU view following the PC |
 | **Sprites on screen** | Live red frames with numbers around every sprite on the screen, cycle exact (multiplexed sprites get a frame for every use), shows invisible sprites too |
 | **Snapshot Manager** | 10 slots with screenshot thumbnails |
-| **Screenshot** | PNG in original resolution with border |
+| **Screenshot** | PNG in original resolution with border, or only the 320x200 picture area without border |
 | **Video Recorder** | MP4 (H.264 + AAC) in original resolution with border, optionally scaled **2×, 3×, 4×** with sharp pixels |
 | **Help / History / About** | Built-in help, the history of the C64 and credits/licenses |
 

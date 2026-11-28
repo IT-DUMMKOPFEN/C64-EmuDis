@@ -180,6 +180,8 @@ static const char *help_text =
     H2("Screenshots and video")
     LI("<i>Tools → Take screenshot</i> saves a PNG in the original resolution with border. "
        "<i>Snapshot → Save/Record media</i> offers all VICE formats (PNG, GIF, BMP, ...).")
+    LI("<i>Tools → Take screenshot (PNG, no border, 320x200)</i> saves only the 320x200 picture "
+       "area without the border (file name ends in -320x200.png).")
     LI("<i>Tools → Video Recorder</i> records MP4 (H.264 + AAC) in original size with border "
        "(384×272 on PAL) or scaled <b>2×, 3× or 4×</b> with sharp pixels.")
     LI("<i>Tools → Start/stop MP4 recording</i> records with the last used size into your Videos folder.")

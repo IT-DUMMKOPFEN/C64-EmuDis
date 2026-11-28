@@ -136,6 +136,10 @@ typedef struct screenshot_s {
 /* Functions called by external emulator code.  */
 int screenshot_init(void);
 void screenshot_shutdown(void);
+/* C64-EmuDis: like screenshot_save(), but only the 320x200 graphics area
+   without the border (VIC-II machines; other chips: the whole screen) */
+int screenshot_save_no_border(const char *drvname, const char *filename,
+                              struct video_canvas_s *canvas);
 int screenshot_save(const char *drvname, const char *filename, struct video_canvas_s *canvas);
 int screenshot_record(void);
 void screenshot_stop_recording(void);

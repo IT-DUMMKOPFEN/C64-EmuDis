@@ -149,6 +149,9 @@ static void screenshot_line_data(screenshot_t *screenshot, uint8_t *data,
 }
 
 /*-----------------------------------------------------------------------*/
+/* C64-EmuDis: set while screenshot_save_no_border() saves */
+static int screenshot_emudis_no_border_flag = 0;
+
 static int screenshot_save_core(screenshot_t *screenshot, gfxoutputdrv_t *drv,
                                 const char *filename)
 {
@@ -157,6 +160,24 @@ static int screenshot_save_core(screenshot_t *screenshot, gfxoutputdrv_t *drv,
     screenshot->width = screenshot->max_width & ~3;
     screenshot->height = screenshot->last_displayed_line - screenshot->first_displayed_line + 1;
     screenshot->y_offset = screenshot->first_displayed_line;
+
+    /* C64-EmuDis: only the 320x200 graphics area, without the border */
+    if (screenshot_emudis_no_border_flag && screenshot->chipid != NULL
+            && strncmp(screenshot->chipid, "VICII", 5) == 0) {
+        unsigned int gx = screenshot->gfx_position.x;
+        unsigned int gy = screenshot->gfx_position.y;
+
+        if (gx + 320 <= screenshot->max_width
+                && gy >= screenshot->first_displayed_line
+                && gy + 200 - 1 <= screenshot->last_displayed_line) {
+            screenshot->x_offset += gx;
+            screenshot->width = 320;
+            screenshot->y_offset = gy;
+            screenshot->height = 200;
+        } else {
+            log_warning(screenshot_log, "No-border screenshot: graphics area not visible, saving the whole screen.");
+        }
+    }
 
     screenshot->color_map = lib_calloc(1, 256);
 
@@ -200,6 +221,17 @@ static int screenshot_save_core(screenshot_t *screenshot, gfxoutputdrv_t *drv,
 }
 
 /*-----------------------------------------------------------------------*/
+
+int screenshot_save_no_border(const char *drvname, const char *filename,
+                              struct video_canvas_s *canvas)
+{
+    int result;
+
+    screenshot_emudis_no_border_flag = 1;
+    result = screenshot_save(drvname, filename, canvas);
+    screenshot_emudis_no_border_flag = 0;
+    return result;
+}
 
 int screenshot_save(const char *drvname, const char *filename,
                     struct video_canvas_s *canvas)

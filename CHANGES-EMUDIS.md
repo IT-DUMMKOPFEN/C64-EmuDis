@@ -54,6 +54,7 @@ lists all files that were changed or added and why. All changes: 2026-10-24, IT-
 | `src/datasette/datasette.c/.h` | `datasette_emudis_is_playing()` for the CPU turbo |
 | `src/arch/headless/ui.c` | C64-EmuDis hooks for the headless UI (used for tests) |
 | `src/arch/sdl/x64sc_ui.c` | Android/SDL menu "CPU turbo (C64-EmuDis)" |
+| `src/screenshot.c/.h` | `screenshot_save_no_border()`: only the 320x200 graphics area (VIC-II) |
 | `src/log.c` | log without colours to stdout also when the log file could not be opened (crash) |
 | `src/arch/sdl/uimenu.c/.h`, `src/arch/sdl/uimon.c` | Android: the keyboard stays open while the monitor is open (it was hidden and shown again for every key); the C64 keyboard overlay types into the menu and the monitor |
 | `src/monitor/monitor.c`, `mon_command.c` | Android: monitor command `quit` (q) leaves the monitor like `exit` instead of ending the app |

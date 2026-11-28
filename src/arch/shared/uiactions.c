@@ -424,6 +424,7 @@ static const ui_action_info_private_t action_info_list[] = {
     { ACTION_EMUDIS_VIDEO,           "emudis-video-recorder", "Open the video recorder", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_VIDEO_TOGGLE,    "emudis-video-toggle", "Start/stop MP4 recording", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_SCREENSHOT,      "emudis-screenshot", "Take a screenshot (PNG)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
+    { ACTION_EMUDIS_SCREENSHOT_NO_BORDER, "emudis-screenshot-no-border", "Take a PNG screenshot of the 320x200 area only (no border)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_FASTLOAD_TOGGLE, "emudis-fastload-toggle", "Toggle fast loading (no loading times)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_FULLMEM,         "emudis-full-memory-view", "Open the full memory view (all 64KB, changes, speed, trainer search)", VICE_MACHINE_ALL^VICE_MACHINE_VSID },
     { ACTION_EMUDIS_SPRITE_OVERLAY_TOGGLE, "emudis-sprite-overlay-toggle", "Toggle \"Sprites on screen\" (red frames around all sprites)", VICE_MACHINE_C64SC|VICE_MACHINE_SCPU64 },
